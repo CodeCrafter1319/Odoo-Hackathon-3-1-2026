@@ -6,6 +6,10 @@
   "author": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "init-admin": "node scripts/initAdmin.js",
+    "list-users": "node scripts/listUsers.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
