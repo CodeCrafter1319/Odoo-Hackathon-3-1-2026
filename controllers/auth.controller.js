@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
       monthlyWage,
       role: role || "employee"
     });
-
+    console.log(user);
     res.status(201).json({
       message: "User registered successfully",
       userId: user._id

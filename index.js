@@ -41,5 +41,5 @@ app.get("/", (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`https://odoo-hackathon-3-1-2026-1.onrender.com/api/auth/`);
 });
