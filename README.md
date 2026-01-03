@@ -3,6 +3,14 @@ Angular frontend for the Resource Augmentation / HRMS system.
 
 The link of the website we made is - https://resource-augmentation.netlify.app/auth/login
 
+The credentials for the admin are :-
+email- panchalnihar18@gmail.com
+password - Panchal6822
+
+The credentials for the user are :-
+email - randomm6822@gmail.com
+password - Random6822
+
 🚀 Tech Stack
 Angular (v19)
 
