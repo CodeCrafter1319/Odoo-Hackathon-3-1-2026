@@ -49,6 +49,7 @@ MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/hr-management
 JWT_SECRET=your-secret-key-min-32-characters
 ADMIN_EMAIL=admin@hrms.com
 ADMIN_PASSWORD=admin123
+CHATGPT_API_URL=https://chatgpt.com/gg/v/6958ab8e49e081a1bfcb896afc1d7697?token=ZXwT5hWNUEQEtEjU6L1EEQ
 ```
 
 ## API Endpoints

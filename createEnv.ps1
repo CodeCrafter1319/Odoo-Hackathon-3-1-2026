@@ -25,11 +25,17 @@ if ([string]::IsNullOrWhiteSpace($adminPassword)) {
     $adminPassword = "admin123"
 }
 
+$chatgptUrl = Read-Host "Enter ChatGPT API URL (or press Enter for default)"
+if ([string]::IsNullOrWhiteSpace($chatgptUrl)) {
+    $chatgptUrl = "https://chatgpt.com/gg/v/6958ab8e49e081a1bfcb896afc1d7697?token=ZXwT5hWNUEQEtEjU6L1EEQ"
+}
+
 $envContent = @"
 MONGO_URI=$mongoUri
 JWT_SECRET=$jwtSecret
 ADMIN_EMAIL=$adminEmail
 ADMIN_PASSWORD=$adminPassword
+CHATGPT_API_URL=$chatgptUrl
 "@
 
 $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline

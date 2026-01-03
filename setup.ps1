@@ -15,6 +15,7 @@ MONGO_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/h
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-min-32-characters-$(Get-Random)
 ADMIN_EMAIL=admin@hrms.com
 ADMIN_PASSWORD=admin123
+CHATGPT_API_URL=https://chatgpt.com/gg/v/6958ab8e49e081a1bfcb896afc1d7697?token=ZXwT5hWNUEQEtEjU6L1EEQ
 "@ | Out-File -FilePath ".env" -Encoding UTF8
         Write-Host "✅ Basic .env file created. Please update MONGO_URI with your MongoDB connection string" -ForegroundColor Green
     }
