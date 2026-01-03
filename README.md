@@ -31,3 +31,7 @@ ng test
 Backend APIs are consumed from the deployed server
 
 Update API URLs in environment.ts if needed
+
+NOTE - IF THE INITIAL LOGIN TO THE WEBSITE SERVER FAILS OR SHOWS "JSON ERROR" THEN PLZ WAIT FOR 5 MINUTES THEN LOGIN TO THE SERVER
+
+THANK YOU!!
