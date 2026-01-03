@@ -1,0 +1,55 @@
+/* You can add global styles to this file, and also import other style files */
+/* Import angular-calendar CSS */
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
+
+/* Global Reset - Remove default margins and padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Global overrides for event colors */
+.cal-event-approved {
+  background-color: #28a745 !important;
+  border-color: #1e7e34 !important;
+}
+
+.cal-event-pending {
+  background-color: #ffc107 !important;
+  border-color: #e0a800 !important;
+  color: #212529 !important;
+}
+
+.cal-event-rejected {
+  background-color: #dc3545 !important;
+  border-color: #c82333 !important;
+}
+
+.cal-event-annual {
+  background-color: #007bff !important;
+  border-color: #0056b3 !important;
+}
+
+.cal-event-sick {
+  background-color: #fd7e14 !important;
+  border-color: #e8590c !important;
+}
+
+.cal-event-emergency {
+  background-color: #e83e8c !important;
+  border-color: #e21e7b !important;
+}

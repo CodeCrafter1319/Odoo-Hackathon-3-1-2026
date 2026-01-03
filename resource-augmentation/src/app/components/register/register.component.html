@@ -1,0 +1,155 @@
+<!-- <div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <h1>Resource Augmentation</h1>
+      <p>Create your account</p>
+    </div>
+    
+    <form (ngSubmit)="onRegister()" class="register-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input 
+            type="text" 
+            id="firstName"
+            name="firstName"
+            [(ngModel)]="registerForm.firstName"
+            placeholder="Enter first name"
+            class="form-input"
+            [class.error]="isFirstNameInvalid()"
+            required>
+          <div class="error-message" *ngIf="isFirstNameInvalid()">
+            First name must be at least 2 characters long
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input 
+            type="text" 
+            id="lastName"
+            name="lastName"
+            [(ngModel)]="registerForm.lastName"
+            placeholder="Enter last name"
+            class="form-input"
+            [class.error]="isLastNameInvalid()"
+            required>
+          <div class="error-message" *ngIf="isLastNameInvalid()">
+            Last name must be at least 2 characters long
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email"
+          name="email"
+          [(ngModel)]="registerForm.email"
+          placeholder="Enter your email"
+          class="form-input"
+          [class.error]="isEmailInvalid()"
+          required>
+        <div class="error-message" *ngIf="isEmailInvalid()">
+          Please enter a valid email address
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phone"
+          name="phone"
+          [(ngModel)]="registerForm.phone"
+          placeholder="Enter 10-digit phone number"
+          class="form-input"
+          [class.error]="isPhoneInvalid()"
+          required>
+        <div class="error-message" *ngIf="isPhoneInvalid()">
+          Please enter a valid 10-digit phone number
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="userType">User Type</label>
+        <select 
+          id="userType"
+          name="userType"
+          [(ngModel)]="registerForm.userType"
+          (change)="onUserTypeChange()"
+          class="form-select"
+          required>
+          <option value="">Select user type</option>
+          <option value="ADMIN">Admin (Company A)</option>
+          <option value="COMPANY">Company Representative</option>
+          <option value="RESOURCE">Resource/Developer</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="filteredRoles.length > 0">
+        <label for="roleId">Role</label>
+        <select 
+          id="roleId"
+          name="roleId"
+          [(ngModel)]="registerForm.roleId"
+          class="form-select"
+          required>
+          <option value="0">Select role</option>
+          <option 
+            *ngFor="let role of filteredRoles" 
+            [value]="role.id">
+            {{role.name}} - {{role.description}}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-input-container">
+          <input 
+            [type]="hidePassword ? 'password' : 'text'"
+            id="password"
+            name="password"
+            [(ngModel)]="registerForm.password"
+            placeholder="Enter password (min 6 characters)"
+            class="form-input"
+            [class.error]="isPasswordInvalid()"
+            required>
+          <button 
+            type="button" 
+            class="password-toggle"
+            (click)="togglePasswordVisibility()">
+            {{hidePassword ? 'show' : 'hide'}}
+          </button>
+        </div>
+        <div class="error-message" *ngIf="isPasswordInvalid()">
+          Password must be at least 6 characters long
+        </div>
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        {{successMessage}}
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{errorMessage}}
+      </div>
+
+      <button 
+        type="submit" 
+        class="register-button"
+        [disabled]="isLoading">
+        <span *ngIf="isLoading" class="loading-spinner">⏳</span>
+        {{isLoading ? 'Creating Account...' : 'Create Account'}}
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p>Already have an account? 
+        <a routerLink="/auth/login">Sign in here</a>
+      </p>
+    </div>
+  </div>
+</div> -->

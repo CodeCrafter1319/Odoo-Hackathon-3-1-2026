@@ -1,0 +1,594 @@
+<div class="profile-wizard-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Complete Your Profile</h1>
+    <p>Fill in your details to get started</p>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-info">
+      <span class="progress-label">Profile Completion</span>
+      <span class="progress-percentage">{{ completionPercent }}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="completionPercent"></div>
+    </div>
+  </div>
+
+  <!-- Step Navigation -->
+  <div class="section-navigation">
+    <button
+      *ngFor="let step of steps; let i = index"
+      class="nav-button"
+      [class.active]="currentStepIndex === i"
+      (click)="gotoStep(i)"
+    >
+      <div class="nav-icon">●</div>
+      <div class="nav-text">
+        <div>{{ step.title }}</div>
+        <small>{{ step.description }}</small>
+      </div>
+      <span class="nav-status" [class.completed]="
+        (step.key === 'personal' && personalForm.valid) ||
+        (step.key === 'education' && educationEntries.length > 0) ||
+        (step.key === 'employment' && employmentEntries.length > 0) ||
+        (step.key === 'languages' && languageEntries.length > 0) ||
+        (step.key === 'certifications' && certificationEntries.length > 0) ||
+        (step.key === 'projects' && projectEntries.length > 0)
+      ">
+        {{ (step.key === 'personal' && personalForm.valid) ||
+           (step.key === 'education' && educationEntries.length > 0) ||
+           (step.key === 'employment' && employmentEntries.length > 0) ||
+           (step.key === 'languages' && languageEntries.length > 0) ||
+           (step.key === 'certifications' && certificationEntries.length > 0) ||
+           (step.key === 'projects' && projectEntries.length > 0) ? '✓' : '○' }}
+      </span>
+    </button>
+  </div>
+
+  <!-- ========== PERSONAL DETAILS SECTION ========== -->
+  <div class="section-content" *ngIf="currentStep === 'personal'">
+    <div class="section-header">
+      <div>
+        <h2>Personal Details</h2>
+        <p>Basic information used across the system</p>
+      </div>
+    </div>
+
+    <form [formGroup]="personalForm" class="section-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label required">First Name</label>
+          <input type="text" class="form-input" formControlName="firstName" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required">Last Name</label>
+          <input type="text" class="form-input" formControlName="lastName" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required">Email</label>
+          <input type="email" class="form-input" formControlName="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-input" formControlName="phone" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" class="form-input" formControlName="dateOfBirth" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" class="form-input" formControlName="city" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <input type="text" class="form-input" formControlName="state" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <input type="text" class="form-input" formControlName="country" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Zip Code</label>
+          <input type="text" class="form-input" formControlName="zipCode" />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Address</label>
+          <textarea class="form-textarea" formControlName="address" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">LinkedIn Profile</label>
+          <input type="url" class="form-input" formControlName="linkedInProfile" placeholder="https://linkedin.com/in/..." />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">GitHub Profile</label>
+          <input type="url" class="form-input" formControlName="gitHubProfile" placeholder="https://github.com/..." />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Portfolio Website</label>
+          <input type="url" class="form-input" formControlName="portfolioWebsite" placeholder="https://..." />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn primary" (click)="savePersonal()">
+          Save Personal Details
+        </button>
+        <button type="button" class="btn secondary" (click)="nextStep()">
+          Next Step →
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ========== EDUCATION SECTION ========== -->
+  <div class="section-content" *ngIf="currentStep === 'education'">
+    <div class="section-header">
+      <div>
+        <h2>Education</h2>
+        <p>Add your degrees and qualifications</p>
+      </div>
+      <button class="btn primary small" (click)="startAddEducation()">
+        + Add Education
+      </button>
+    </div>
+
+    <!-- Education Form -->
+    <form [formGroup]="educationForm" class="section-form" *ngIf="showEducationForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label required">Degree</label>
+          <input type="text" class="form-input" formControlName="degree" placeholder="e.g., Bachelor of Technology" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Field of Study</label>
+          <input type="text" class="form-input" formControlName="fieldOfStudy" placeholder="e.g., Computer Science" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Institution</label>
+          <input type="text" class="form-input" formControlName="institution" placeholder="e.g., University Name" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Grade/CGPA</label>
+          <input type="text" class="form-input" formControlName="grade" placeholder="e.g., 9.0/10" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input" formControlName="startDate" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input" formControlName="endDate" />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" formControlName="description" rows="3" placeholder="Additional details..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn ghost" (click)="cancelEducationEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn primary" (click)="saveEducation()">
+          Save Education
+        </button>
+      </div>
+    </form>
+
+    <!-- Education Entries -->
+    <div class="entries-container" *ngIf="educationEntries.length > 0">
+      <div class="entry-card" *ngFor="let e of educationEntries; let i = index">
+        <div class="entry-header">
+          <h3>{{ e.degree }} — {{ e.fieldOfStudy }}</h3>
+          <div class="entry-actions">
+            <button class="btn small secondary" (click)="editEducation(i)">Edit</button>
+            <button class="btn small danger" (click)="deleteEducation(e.Id)">Delete</button>
+          </div>
+        </div>
+        <div style="padding: 1rem 1.25rem; background: transparent;">
+          <p class="muted"><strong>{{ e.institution }}</strong></p>
+          <p class="muted">{{ toYMD(e.startDate) || '—' }} — {{ toYMD(e.endDate) || 'Present' }}</p>
+          <p class="muted" *ngIf="e.grade">Grade: {{ e.grade }}</p>
+          <p *ngIf="e.description">{{ e.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="educationEntries.length === 0 && !showEducationForm">
+      <div class="empty-icon">🎓</div>
+      <p>No education records yet. Click "Add Education" to get started.</p>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem;">
+      <button type="button" class="btn ghost" (click)="prevStep()">← Previous</button>
+      <button type="button" class="btn secondary" (click)="nextStep()">Next Step →</button>
+    </div>
+  </div>
+
+  <!-- ========== EMPLOYMENT SECTION ========== -->
+  <div class="section-content" *ngIf="currentStep === 'employment'">
+    <div class="section-header">
+      <div>
+        <h2>Employment</h2>
+        <p>Add your work history</p>
+      </div>
+      <button class="btn primary small" (click)="startAddEmployment()">
+        + Add Employment
+      </button>
+    </div>
+
+    <!-- Employment Form -->
+    <form [formGroup]="employmentForm" class="section-form" *ngIf="showEmploymentForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label required">Job Title</label>
+          <input type="text" class="form-input" formControlName="jobTitle" placeholder="e.g., Senior Developer" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required">Company Name</label>
+          <input type="text" class="form-input" formControlName="companyName" placeholder="e.g., Tech Corp" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-input" formControlName="location" placeholder="e.g., New York, USA" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Skills (comma-separated)</label>
+          <input type="text" class="form-input" formControlName="skills" placeholder="e.g., React, Node.js, MongoDB" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input" formControlName="startDate" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input" formControlName="endDate" [disabled]="employmentForm.get('isCurrentJob')?.value" />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isCurrentJob" />
+            <span>I currently work here</span>
+          </label>
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" formControlName="description" rows="4" placeholder="Describe your role and responsibilities..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn ghost" (click)="cancelEmploymentEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn primary" (click)="saveEmployment()">
+          Save Employment
+        </button>
+      </div>
+    </form>
+
+    <!-- Employment Entries -->
+    <div class="entries-container" *ngIf="employmentEntries.length > 0">
+      <div class="entry-card" *ngFor="let emp of employmentEntries; let i = index">
+        <div class="entry-header">
+          <h3>{{ emp.jobTitle }} — {{ emp.companyName }}</h3>
+          <div class="entry-actions">
+            <button class="btn small secondary" (click)="editEmployment(i)">Edit</button>
+            <button class="btn small danger" (click)="deleteEmployment(emp.Id)">Delete</button>
+          </div>
+        </div>
+        <div style="padding: 1rem 1.25rem; background: transparent;">
+          <p class="muted">{{ emp.location || '—' }} • {{ toYMD(emp.startDate) || '—' }} — {{ toYMD(emp.endDate) || 'Present' }}</p>
+          <p *ngIf="emp.skills && emp.skills.length > 0" class="muted">
+            <strong>Skills:</strong>
+            <span *ngIf="isArray(emp.skills)">{{ emp.skills.join(', ') }}</span>
+            <span *ngIf="!isArray(emp.skills)">{{ emp.skills }}</span>
+          </p>
+          <p *ngIf="emp.description">{{ emp.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="employmentEntries.length === 0 && !showEmploymentForm">
+      <div class="empty-icon">💼</div>
+      <p>No employment records yet. Click "Add Employment" to get started.</p>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem;">
+      <button type="button" class="btn ghost" (click)="prevStep()">← Previous</button>
+      <button type="button" class="btn secondary" (click)="nextStep()">Next Step →</button>
+    </div>
+  </div>
+
+  <!-- ========== LANGUAGES SECTION ========== -->
+  <div class="section-content" *ngIf="currentStep === 'languages'">
+    <div class="section-header">
+      <div>
+        <h2>Languages</h2>
+        <p>Languages you can speak (Optional)</p>
+      </div>
+      <button class="btn primary small" (click)="startAddLanguage()">
+        + Add Language
+      </button>
+    </div>
+
+    <!-- Language Form -->
+    <form [formGroup]="languageForm" class="section-form" *ngIf="showLanguageForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label required">Language Name</label>
+          <input type="text" class="form-input" formControlName="name" placeholder="e.g., English" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required">Proficiency Level</label>
+          <select class="form-input" formControlName="level">
+            <option *ngFor="let level of languageLevels" [value]="level">{{ level }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn ghost" (click)="cancelLanguageEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn primary" (click)="saveLanguage()">
+          Save Language
+        </button>
+      </div>
+    </form>
+
+    <!-- Language Entries -->
+    <div class="entries-container" *ngIf="languageEntries.length > 0">
+      <div class="entry-card" *ngFor="let lang of languageEntries; let i = index">
+        <div class="entry-header">
+          <h3>{{ lang.name }}</h3>
+          <div class="entry-actions">
+            <button class="btn small secondary" (click)="editLanguage(i)">Edit</button>
+            <button class="btn small danger" (click)="deleteLanguage(lang.Id)">Delete</button>
+          </div>
+        </div>
+        <div style="padding: 1rem 1.25rem; background: transparent;">
+          <p class="muted"><strong>Level:</strong> {{ lang.level }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="languageEntries.length === 0 && !showLanguageForm">
+      <div class="empty-icon">🌐</div>
+      <p>No languages added yet. Click "Add Language" to get started.</p>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem;">
+      <button type="button" class="btn ghost" (click)="prevStep()">← Previous</button>
+      <button type="button" class="btn secondary" (click)="nextStep()">Next Step →</button>
+    </div>
+  </div>
+
+  <!-- ========== CERTIFICATIONS SECTION ========== -->
+  <div class="section-content" *ngIf="currentStep === 'certifications'">
+    <div class="section-header">
+      <div>
+        <h2>Certifications</h2>
+        <p>Professional certifications and credentials (Optional)</p>
+      </div>
+      <button class="btn primary small" (click)="startAddCertification()">
+        + Add Certification
+      </button>
+    </div>
+
+    <!-- Certification Form -->
+    <form [formGroup]="certificationForm" class="section-form" *ngIf="showCertificationForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label required">Certification Title</label>
+          <input type="text" class="form-input" formControlName="title" placeholder="e.g., AWS Certified Solutions Architect" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Issuing Organization</label>
+          <input type="text" class="form-input" formControlName="issuingOrganization" placeholder="e.g., Amazon Web Services" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Issue Date</label>
+          <input type="date" class="form-input" formControlName="issueDate" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Expiry Date</label>
+          <input type="date" class="form-input" formControlName="expiryDate" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Credential ID</label>
+          <input type="text" class="form-input" formControlName="credentialId" placeholder="e.g., ABC123XYZ" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Credential URL</label>
+          <input type="url" class="form-input" formControlName="link" placeholder="https://..." />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" formControlName="description" rows="3" placeholder="Additional details about this certification..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn ghost" (click)="cancelCertificationEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn primary" (click)="saveCertification()">
+          Save Certification
+        </button>
+      </div>
+    </form>
+
+    <!-- Certification Entries -->
+    <div class="entries-container" *ngIf="certificationEntries.length > 0">
+      <div class="entry-card" *ngFor="let cert of certificationEntries; let i = index">
+        <div class="entry-header">
+          <h3>{{ cert.title }}</h3>
+          <div class="entry-actions">
+            <button class="btn small secondary" (click)="editCertification(i)">Edit</button>
+            <button class="btn small danger" (click)="deleteCertification(cert.Id)">Delete</button>
+          </div>
+        </div>
+        <div style="padding: 1rem 1.25rem; background: transparent;">
+          <p class="muted" *ngIf="cert.issuingOrganization"><strong>{{ cert.issuingOrganization }}</strong></p>
+          <p class="muted" *ngIf="cert.issueDate">
+            Issued: {{ toYMD(cert.issueDate) }}
+            <span *ngIf="cert.expiryDate"> • Expires: {{ toYMD(cert.expiryDate) }}</span>
+          </p>
+          <p class="muted" *ngIf="cert.credentialId">Credential ID: {{ cert.credentialId }}</p>
+          <p *ngIf="cert.link">
+            <a [href]="cert.link" target="_blank" rel="noopener noreferrer" class="link">View Credential →</a>
+          </p>
+          <p *ngIf="cert.description">{{ cert.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="certificationEntries.length === 0 && !showCertificationForm">
+      <div class="empty-icon">📜</div>
+      <p>No certifications added yet. Click "Add Certification" to get started.</p>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem;">
+      <button type="button" class="btn ghost" (click)="prevStep()">← Previous</button>
+      <button type="button" class="btn secondary" (click)="nextStep()">Next Step →</button>
+    </div>
+  </div>
+
+  <!-- ========== PROJECTS SECTION ========== -->
+  <div class="section-content" *ngIf="currentStep === 'projects'">
+    <div class="section-header">
+      <div>
+        <h2>Projects</h2>
+        <p>Showcase your notable projects (Optional)</p>
+      </div>
+      <button class="btn primary small" (click)="startAddProject()">
+        + Add Project
+      </button>
+    </div>
+
+    <!-- Project Form -->
+    <form [formGroup]="projectForm" class="section-form" *ngIf="showProjectForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label required">Project Title</label>
+          <input type="text" class="form-input" formControlName="title" placeholder="e.g., E-commerce Platform" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Project Link</label>
+          <input type="url" class="form-input" formControlName="link" placeholder="https://..." />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input" formControlName="startDate" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input" formControlName="endDate" [disabled]="projectForm.get('isOngoing')?.value" />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isOngoing" />
+            <span>This is an ongoing project</span>
+          </label>
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Technologies (comma-separated)</label>
+          <input type="text" class="form-input" formControlName="technologies" placeholder="e.g., React, TypeScript, PostgreSQL" />
+        </div>
+
+        <div class="form-group grid-span-2">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" formControlName="description" rows="4" placeholder="Describe the project, your role, and key achievements..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn ghost" (click)="cancelProjectEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn primary" (click)="saveProject()">
+          Save Project
+        </button>
+      </div>
+    </form>
+
+    <!-- Project Entries -->
+    <div class="entries-container" *ngIf="projectEntries.length > 0">
+      <div class="entry-card" *ngFor="let proj of projectEntries; let i = index">
+        <div class="entry-header">
+          <h3>{{ proj.title }}</h3>
+          <div class="entry-actions">
+            <button class="btn small secondary" (click)="editProject(i)">Edit</button>
+            <button class="btn small danger" (click)="deleteProject(proj.Id)">Delete</button>
+          </div>
+        </div>
+        <div style="padding: 1rem 1.25rem; background: transparent;">
+          <p class="muted">
+            {{ toYMD(proj.startDate) || '—' }} — {{ proj.isOngoing ? 'Ongoing' : (toYMD(proj.endDate) || 'Completed') }}
+          </p>
+          <p *ngIf="proj.technologies && proj.technologies.length > 0" class="muted">
+            <strong>Technologies:</strong>
+            <span *ngIf="isArray(proj.technologies)">{{ proj.technologies.join(', ') }}</span>
+            <span *ngIf="!isArray(proj.technologies)">{{ proj.technologies }}</span>
+          </p>
+          <p *ngIf="proj.link">
+            <a [href]="proj.link" target="_blank" rel="noopener noreferrer" class="link">View Project →</a>
+          </p>
+          <p *ngIf="proj.description">{{ proj.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="projectEntries.length === 0 && !showProjectForm">
+      <div class="empty-icon">🚀</div>
+      <p>No projects added yet. Click "Add Project" to get started.</p>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem;">
+      <button type="button" class="btn ghost" (click)="prevStep()">← Previous</button>
+      <!-- <button type="button" class="btn primary" >
+        Complete Profile
+      </button> -->
+    </div>
+  </div>
+</div>

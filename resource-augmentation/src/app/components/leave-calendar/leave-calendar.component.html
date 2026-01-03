@@ -1,0 +1,223 @@
+<div class="leave-calendar-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Leave Calendar</h1>
+    <p>View all employee leave applications in calendar format</p>
+  </div>
+
+  <!-- Loading & Error States -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading leave data...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section card">
+    <div class="card-header">
+      <h5>Filters</h5>
+      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()">
+        Clear All
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Single row for all filters -->
+      <div class="filter-container">
+        <div class="filter-item">
+          <label for="leaveTypeFilter" class="form-label">Leave Type</label>
+          <select
+            id="leaveTypeFilter"
+            class="form-select"
+            [(ngModel)]="selectedLeaveType"
+            (change)="onFilterChange()"
+          >
+            <option value="ALL">All Leave Types</option>
+            <option
+              *ngFor="let type of filterOptions.leaveTypes"
+              [value]="type"
+            >
+              {{ type }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="statusFilter" class="form-label">Status</label>
+          <select
+            id="statusFilter"
+            class="form-select"
+            [(ngModel)]="selectedStatus"
+            (change)="onFilterChange()"
+          >
+            <option value="ALL">All Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="employeeFilter" class="form-label">Employee</label>
+          <select
+            id="employeeFilter"
+            class="form-select"
+            [(ngModel)]="selectedEmployee"
+            (change)="onFilterChange()"
+          >
+            <option value="ALL">All Employees</option>
+            <option
+              *ngFor="let employee of filterOptions.employees"
+              [value]="employee.id"
+            >
+              {{ employee.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-item filter-actions">
+          <label class="form-label invisible">Actions</label>
+          <button class="btn btn-primary" (click)="refreshData()">
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Navigation -->
+  <div class="calendar-navigation">
+    <div class="row text-center">
+      <div class="col-md-4">
+        <div class="btn-group" role="group">
+          <button
+            class="btn btn-primary"
+            mwlCalendarPreviousView
+            [view]="view"
+            [(viewDate)]="viewDate"
+            (viewDateChange)="closeOpenMonthViewDay()"
+          >
+            Previous Month
+          </button>
+          <button
+            class="btn btn-outline-secondary"
+            mwlCalendarToday
+            [(viewDate)]="viewDate"
+          >
+            This Month
+          </button>
+          <button
+            class="btn btn-primary"
+            mwlCalendarNextView
+            [view]="view"
+            [(viewDate)]="viewDate"
+            (viewDateChange)="closeOpenMonthViewDay()"
+          >
+            Next Month
+          </button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <h3>{{ viewDate | calendarDate : view + "ViewTitle" : "en" }}</h3>
+      </div>
+
+      <div class="col-md-4">
+        <div class="btn-group" role="group">
+          <button
+            class="btn btn-outline-primary"
+            (click)="setView(CalendarView.Month)"
+            [class.active]="view === CalendarView.Month"
+          >
+            Month
+          </button>
+          <button
+            class="btn btn-outline-primary"
+            (click)="setView(CalendarView.Week)"
+            [class.active]="view === CalendarView.Week"
+          >
+            Week
+          </button>
+          <button
+            class="btn btn-outline-primary"
+            (click)="setView(CalendarView.Day)"
+            [class.active]="view === CalendarView.Day"
+          >
+            Day
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Views -->
+  <div class="calendar-container">
+    @switch (view) { @case (CalendarView.Month) {
+    <mwl-calendar-month-view
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      [activeDayIsOpen]="activeDayIsOpen"
+      (dayClicked)="dayClicked($event.day)"
+      (eventClicked)="handleEvent('Clicked', $event.event)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+    >
+    </mwl-calendar-month-view>
+    } @case (CalendarView.Week) {
+    <mwl-calendar-week-view
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (eventClicked)="handleEvent('Clicked', $event.event)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+    >
+    </mwl-calendar-week-view>
+    } @case (CalendarView.Day) {
+    <mwl-calendar-day-view
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (eventClicked)="handleEvent('Clicked', $event.event)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+    >
+    </mwl-calendar-day-view>
+    } }
+  </div>
+
+  <!-- Legend -->
+  <div class="legend-section card mt-4">
+    <div class="card-header">
+      <h6>Legend</h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="legend-item">
+            <span class="legend-color pending-color"></span>
+            Pending
+          </span>
+        </div>
+        <div class="col-md-2">
+          <span class="legend-item">
+            <span class="legend-color approved-color"></span>
+            Approved
+          </span>
+        </div>
+        <div class="col-md-2">
+          <span class="legend-item">
+            <span class="legend-color rejected-color"></span>
+            Rejected
+          </span>
+        </div>
+        <div class="col-md-2">
+          <span class="legend-item">
+            <span class="legend-color annual-color"></span>
+            Annual Leave
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

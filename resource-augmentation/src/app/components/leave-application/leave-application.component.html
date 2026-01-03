@@ -1,0 +1,241 @@
+<div class="leave-application-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Leave Application</h1>
+    <p>Apply for leave with detailed day-wise configuration</p>
+  </div>
+
+  <!-- Alert messages -->
+  <div *ngIf="errorMessage" class="alert error">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="emailNotificationStatus" class="notification-status" 
+     [ngClass]="emailNotificationStatus.managerNotified ? 'notification-success' : 'notification-warning'">
+  <div class="notification-icon">
+    <span *ngIf="emailNotificationStatus.managerNotified">✅</span>
+    <span *ngIf="!emailNotificationStatus.managerNotified">⚠️</span>
+  </div>
+  <div class="notification-message">
+    {{ emailNotificationStatus.notificationMessage }}
+  </div>
+</div>
+  <!-- Balance Section -->
+  <div class="balance-section">
+    <h2>Leave Balance</h2>
+    <div class="balance-cards">
+      <div *ngFor="let balance of leaveBalances" class="balance-card">
+        <h3>{{ balance.leaveTypeName }}</h3>
+        <div class="balance-info">
+          <span class="available">{{ balance.availableDays }}</span>
+          <span class="separator">/</span>
+          <span class="total">{{ balance.totalAllocated }}</span>
+        </div>
+        <small>Available / Total</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section with proper Angular form binding -->
+  <form (ngSubmit)="onSubmitLeave()" #leaveApplicationForm="ngForm" class="form-section">
+    <h2>Leave Details</h2>
+    <div class="form-grid">
+      <!-- Leave Type -->
+      <div class="form-group">
+        <label class="form-label required">Leave Type</label>
+        <select 
+          [(ngModel)]="leaveForm.leaveTypeId" 
+          name="leaveTypeId"
+          class="form-select" 
+          (change)="onLeaveTypeChange()" 
+          required>
+          <option value="0">Select Leave Type</option>
+          <option *ngFor="let type of leaveTypes" [value]="type.Id">
+            {{ type.Name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- From Date -->
+      <div class="form-group">
+        <label class="form-label required">From Date</label>
+        <input 
+          type="date" 
+          [(ngModel)]="leaveForm.fromDate" 
+          name="fromDate"
+          (change)="onDateRangeChange()" 
+          class="form-input" 
+          required>
+      </div>
+
+      <!-- To Date -->
+      <div class="form-group">
+        <label class="form-label required">To Date</label>
+        <input 
+          type="date" 
+          [(ngModel)]="leaveForm.toDate" 
+          name="toDate"
+          (change)="onDateRangeChange()" 
+          class="form-input" 
+          required>
+      </div>
+
+      <!-- Total Leave Days -->
+      <div class="form-group">
+        <label class="form-label">Total Leave Days</label>
+        <div class="calculated-days">
+          <span class="days-count">{{ calculateRequestedDays() }}</span>
+          <span class="days-label">days requested</span>
+        </div>
+      </div>
+
+      <!-- Reason -->
+      <div class="form-group full-width">
+        <label class="form-label required">Reason</label>
+        <textarea 
+          [(ngModel)]="leaveForm.reason" 
+          name="reason"
+          class="form-textarea" 
+          placeholder="Enter reason for leave" 
+          required>
+        </textarea>
+      </div>
+
+      <!-- Allow Unpaid Leaves Checkbox -->
+      <div class="form-group full-width">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="allowUnpaidLeaves" 
+            name="allowUnpaidLeaves"
+            (change)="onAllowUnpaidLeavesChange()">
+          Allow unpaid leaves if balance is insufficient
+        </label>
+        <small class="help-text">
+          If checked, you can take more leaves than your available balance. Extra days will be unpaid.
+        </small>
+      </div>
+    </div>
+
+    <!-- Payment Breakdown -->
+    <div *ngIf="paymentBreakdown && showDayDetails" class="payment-breakdown">
+      <h4>Payment Breakdown</h4>
+      <div class="breakdown-grid">
+        <div class="breakdown-item">
+          <span class="label">Requested Days:</span>
+          <span class="value">{{ paymentBreakdown.requestedDays }}</span>
+        </div>
+        <div class="breakdown-item paid">
+          <span class="label">Paid Days:</span>
+          <span class="value">{{ paymentBreakdown.paidDays }}</span>
+        </div>
+        <div class="breakdown-item unpaid" *ngIf="paymentBreakdown.unpaidDays > 0">
+          <span class="label">Unpaid Days:</span>
+          <span class="value">{{ paymentBreakdown.unpaidDays }}</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="label">Available Balance:</span>
+          <span class="value">{{ paymentBreakdown.availableDays }}</span>
+        </div>
+      </div>
+      
+      <!-- Payment Summary Alert -->
+      <div *ngIf="paymentBreakdown.unpaidDays > 0" class="payment-alert">
+        <strong>Note:</strong> {{ paymentBreakdown.unpaidDays }} day(s) will be unpaid as they exceed your available balance.
+      </div>
+    </div>
+
+    <!-- Day Configuration Section -->
+    <div *ngIf="showDayDetails" class="day-configuration-section">
+      <h3>Configure Leave Days</h3>
+      <p class="section-description">Configure each day as full day or half day leave</p>
+      
+      <div class="days-grid">
+        <div *ngFor="let day of leaveDays; let i = index" class="day-card">
+          <div class="day-header">
+            <h4>{{ formatDate(day.date) }}</h4>
+            <span class="day-number">Day {{ i + 1 }}</span>
+          </div>
+          
+          <div class="day-controls">
+            <!-- Leave Type Toggle -->
+            <div class="leave-type-toggle">
+              <label class="radio-label">
+                <input 
+                  type="radio" 
+                  [name]="'dayType_' + i" 
+                  [value]="false"
+                  [(ngModel)]="day.isHalfDay"
+                  (change)="onDayTypeChange(i)">
+                Full Day
+              </label>
+              <label class="radio-label">
+                <input 
+                  type="radio" 
+                  [name]="'dayType_' + i" 
+                  [value]="true"
+                  [(ngModel)]="day.isHalfDay"
+                  (change)="onDayTypeChange(i)">
+                Half Day
+              </label>
+            </div>
+
+            <!-- Half Day Options -->
+            <div *ngIf="day.isHalfDay" class="half-day-options">
+              <div class="half-day-toggle">
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    [name]="'halfDayType_' + i" 
+                    value="MORNING"
+                    [(ngModel)]="day.halfDayType">
+                  Morning
+                </label>
+                <label class="radio-label">
+                  <input 
+                    type="radio" 
+                    [name]="'halfDayType_' + i" 
+                    value="AFTERNOON"
+                    [(ngModel)]="day.halfDayType">
+                  Afternoon
+                </label>
+              </div>
+            </div>
+
+            <!-- Day Summary -->
+            <div class="day-summary">
+              <span *ngIf="!day.isHalfDay" class="full-day-badge">Full Day</span>
+              <span *ngIf="day.isHalfDay" class="half-day-badge">
+                Half Day - {{ day.halfDayType || 'Not Selected' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn secondary" 
+        (click)="resetForm()">
+        Reset
+      </button>
+      <button 
+        type="submit" 
+        class="btn primary" 
+        [disabled]="isLoading || leaveApplicationForm.invalid || !showDayDetails">
+        {{ isLoading ? 'Submitting...' : 'Submit Leave Application' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Processing your leave application...</p>
+  </div>
+</div>

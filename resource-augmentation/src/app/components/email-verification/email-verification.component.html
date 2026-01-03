@@ -1,0 +1,158 @@
+<div class="container">
+  <div class="card">
+    
+    <!-- Verifying Step -->
+    <div *ngIf="currentStep === 'verifying'" class="text-center">
+      <div class="status-icon loading">
+        <div class="spinner"></div>
+      </div>
+      <div class="header">
+        <h2>Verifying Email</h2>
+        <p>Please wait while we verify your email address</p>
+      </div>
+    </div>
+
+    <!-- Set Password Step (DIRECT TRANSITION) -->
+    <div *ngIf="currentStep === 'set-password'">
+      <div class="header">
+        <h2>Set Your Password</h2>
+        <p>Your email has been verified! Now create a secure password for your account.</p>
+      </div>
+
+      <!-- Show user info -->
+      <div class="info-box" *ngIf="userInfo">
+        <h3>Welcome, {{ userInfo?.firstName }} {{ userInfo?.lastName }}</h3>
+        <ul class="info-list">
+          <li><strong>Email:</strong> {{ userInfo?.email }}</li>
+          <li><strong>Account Type:</strong> {{ userInfo?.role }}</li>
+        </ul>
+      </div>
+
+      <form class="form" (ngSubmit)="onSetPassword()">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input
+              id="password"
+              name="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              [(ngModel)]="passwordForm.password"
+              class="form-input"
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility('password')"
+            >
+              {{ hidePassword ? 'Show' : 'Hide' }}
+            </button>
+          </div>
+          <span *ngIf="passwordForm.password && passwordForm.password.length < 6" class="error-text">
+            Password must be at least 6 characters
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="password-field">
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              [type]="hideConfirmPassword ? 'password' : 'text'"
+              [(ngModel)]="passwordForm.confirmPassword"
+              class="form-input"
+              placeholder="Confirm your password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility('confirmPassword')"
+            >
+              {{ hideConfirmPassword ? 'Show' : 'Hide' }}
+            </button>
+          </div>
+          <span *ngIf="passwordForm.confirmPassword && passwordForm.password !== passwordForm.confirmPassword" class="error-text">
+            Passwords do not match
+          </span>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert error">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="!isPasswordFormValid() || isLoading"
+          class="btn btn-primary btn-full"
+        >
+          <span *ngIf="isLoading">Setting Password...</span>
+          <span *ngIf="!isLoading">Set Password</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Complete Step -->
+    <div *ngIf="currentStep === 'complete'" class="text-center">
+      <div class="status-icon success">
+        ✓
+      </div>
+      <div class="header">
+        <h2>Setup Complete</h2>
+      </div>
+      
+      <div *ngIf="successMessage" class="alert success">
+        {{ successMessage }}
+      </div>
+      
+      <div class="info-box">
+        <h3>Your account is ready</h3>
+        <ul class="info-list">
+          <li>Login with your email and password</li>
+          <li>Complete your profile information</li>
+          <li>Access your dashboard</li>
+        </ul>
+      </div>
+      
+      <button 
+        (click)="goToLogin()"
+        class="btn btn-primary btn-full"
+      >
+        Go to Login
+      </button>
+    </div>
+
+    <!-- Error Step -->
+    <div *ngIf="currentStep === 'error'" class="text-center">
+      <div class="status-icon error">
+        ✕
+      </div>
+      <div class="header">
+        <h2>Verification Failed</h2>
+      </div>
+      
+      <div class="alert error">
+        {{ errorMessage }}
+      </div>
+      
+      <div class="info-box">
+        <h3>Possible reasons:</h3>
+        <ul class="info-list">
+          <li>Link has expired (valid for 24 hours)</li>
+          <li>Link has already been used</li>
+          <li>Link is invalid or corrupted</li>
+        </ul>
+      </div>
+      
+      <button 
+        (click)="goToLogin()"
+        class="btn btn-secondary btn-full"
+      >
+        Go to Login
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,163 @@
+<div class="leave-management-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Leave Management</h1>
+      <p>Manage all employee leave applications</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn secondary" (click)="goBackToDashboard()">
+        ← Back to Dashboard
+      </button>
+      <button class="btn primary" (click)="refreshData()">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Alert messages -->
+  <div *ngIf="errorMessage" class="alert error">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <h3>Filters</h3>
+    <div class="filters-grid">
+      <!-- Status Filter -->
+      <div class="filter-group">
+        <label for="statusFilter">Status:</label>
+        <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+          <option value="ALL">All Status</option>
+          <option value="PENDING">Pending</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+      </div>
+
+      <!-- Search Filter -->
+      <div class="filter-group">
+        <label for="searchTerm">Search Employee:</label>
+        <input 
+          type="text" 
+          id="searchTerm" 
+          [(ngModel)]="searchTerm" 
+          (input)="onSearchChange()"
+          placeholder="Employee name or leave type">
+      </div>
+
+      <!-- Date Filter -->
+      <div class="filter-group">
+        <label for="dateFilter">Date within leave period:</label>
+        <input 
+          type="date" 
+          id="dateFilter" 
+          [(ngModel)]="dateFilter" 
+          (change)="onDateFilterChange()">
+      </div>
+
+      <!-- Clear Filters -->
+      <div class="filter-group">
+        <button class="btn secondary" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary">
+    <p>Showing {{ filteredApplications.length }} of {{ allLeaveApplications.length }} applications</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading leave applications...</p>
+  </div>
+
+  <!-- Applications Table -->
+  <div *ngIf="!isLoading && filteredApplications.length > 0" class="applications-table-container">
+    <table class="applications-table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Leave Type</th>
+          <th>From Date</th>
+          <th>To Date</th>
+          <th>Days</th>
+          <th>Applied On</th>
+          <th>Status</th>
+          <th>Paid/Unpaid</th>
+          <!-- <th>Actions</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let application of filteredApplications">
+          <td>
+            <div class="employee-info">
+              <strong>{{ application.FirstName }} {{ application.LastName }}</strong>
+              <small>{{ application.Email }}</small>
+            </div>
+          </td>
+          <td>{{ application.LeaveTypeName }}</td>
+          <td>{{ formatDate(application.FromDate) }}</td>
+          <td>{{ formatDate(application.ToDate) }}</td>
+          <td>
+            <span class="days-badge">{{ application.CalculatedDays || application.TotalDays }}</span>
+          </td>
+          <td>{{ formatDate(application.AppliedAt) }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(application.Status)">
+              {{ application.Status }}
+            </span>
+          </td>
+          <td>
+            <div class="payment-info">
+              <span *ngIf="application.PaidDays" class="paid-days">
+                Paid: {{ application.PaidDays }}
+              </span>
+              <span *ngIf="application.UnpaidDays > 0" class="unpaid-days">
+                Unpaid: {{ application.UnpaidDays }}
+              </span>
+              <span *ngIf="!application.PaidDays && !application.UnpaidDays" class="all-paid">
+                All Paid
+              </span>
+            </div>
+          </td>
+          <!-- <td>
+            <div class="action-buttons">
+              <button 
+                class="btn small primary" 
+                (click)="viewApplicationDetails(application)">
+                View
+              </button>
+              <button 
+                *ngIf="application.Status === 'PENDING'" 
+                class="btn small success" 
+                (click)="approveApplication(application.Id)">
+                Approve
+              </button>
+              <button 
+                *ngIf="application.Status === 'PENDING'" 
+                class="btn small danger" 
+                (click)="rejectApplication(application.Id)">
+                Reject
+              </button>
+            </div>
+          </td> -->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredApplications.length === 0" class="empty-state">
+    <h3>No leave applications found</h3>
+    <p *ngIf="allLeaveApplications.length === 0">No employees have applied for leave yet.</p>
+    <p *ngIf="allLeaveApplications.length > 0">Try adjusting your filters to see more results.</p>
+  </div>
+</div>

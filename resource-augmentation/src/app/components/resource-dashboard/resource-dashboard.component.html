@@ -1,0 +1,327 @@
+<div class="rd-container">
+  <!-- Header -->
+  <div class="rd-header">
+    <h1>Dashboard</h1>
+    <div class="rd-actions">
+      <button class="btn btn-outline" (click)="viewProfile()">
+        View Profile
+      </button>
+      <button class="btn btn-primary" (click)="navigateToLeaveApplication()">
+        Apply for Leave
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="rd-grid">
+    <!-- Left: Profile Card -->
+    <div class="card profile-card">
+      <div class="profile-top">
+        <div class="avatar">
+          {{ currentUser?.firstName?.charAt(0) || "U"
+          }}{{ currentUser?.lastName?.charAt(0) || "" }}
+        </div>
+        <div class="profile-meta">
+          <div class="profile-name">
+            {{ currentUser?.firstName || "User" }}
+            {{ currentUser?.lastName || "" }}
+          </div>
+          <div class="profile-role">{{ currentUser?.role || "RESOURCE" }}</div>
+          <div class="profile-email">{{ currentUser?.email || "" }}</div>
+        </div>
+        <div class="completion">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <path
+              class="circle-bg"
+              d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path
+              class="circle"
+              [attr.stroke-dasharray]="completionPercent + ', 100'"
+              d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <text x="18" y="20.35" class="percentage">
+              {{ completionPercent }}%
+            </text>
+          </svg>
+          <span class="completion-label">Profile Complete</span>
+        </div>
+      </div>
+
+      <!-- Profile Stats -->
+      <dl class="profile-stats">
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ profileDetail?.phone || "—" }}</dd>
+        </div>
+        <div>
+          <dt>Location</dt>
+          <dd>
+            {{
+              profileDetail?.city
+                ? profileDetail?.city +
+                  (profileDetail?.state ? ", " + profileDetail?.state : "")
+                : profileDetail?.country || "—"
+            }}
+          </dd>
+        </div>
+        <div>
+          <dt>Leave Balance</dt>
+          <dd>{{ leaveBalanceDisplay() }} days</dd>
+        </div>
+      </dl>
+
+      <!-- User Skills Section -->
+      <div class="skills-section" *ngIf="userSkills && userSkills.length > 0">
+        <h3 class="section-title">Skills</h3>
+        <div class="skills-grid">
+          <span class="skill-tag" *ngFor="let skill of userSkills">{{
+            skill
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Profile Completion Alert -->
+      <div class="alert" *ngIf="completionPercent < 100">
+        <svg
+          class="alert-icon"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <div class="alert-content">
+          <div class="alert-text">
+            Complete your profile to increase visibility — add education and
+            employment details.
+          </div>
+          <button class="alert-action" (click)="redirectUpdateProfile()">
+            Complete Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-col">
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="stat-card">
+          <div class="stat-value">{{ leaveBalanceDisplay() }}</div>
+          <div class="stat-label">Leave Days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ pendingApprovals ?? "--" }}</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="dashboard-card">
+  <div class="card-header">
+    <h3>Recent Activity</h3>
+  </div>
+  <div class="card-content">
+    <div *ngIf="loadingActivity" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading activities...</p>
+    </div>
+
+    <div *ngIf="!loadingActivity && activities.length === 0" class="empty-state">
+      <p>No recent activities</p>
+    </div>
+
+    <div *ngIf="!loadingActivity && activities.length > 0" class="activity-list">
+      <div *ngFor="let activity of activities" class="activity-item">
+        <div class="activity-details">
+          <p class="activity-description">{{ activity.Description }}</p>
+          <div class="activity-meta">
+            <span class="activity-user">{{ activity.UserName }}</span>
+            <span class="activity-separator">•</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+  <!-- Leave Applications History Section -->
+  <div class="dashboard-section leave-history-section">
+    <div class="section-header">
+      <h3>My Leave Applications</h3>
+      <div class="filter-buttons">
+        <button
+          class="filter-btn"
+          [class.active]="selectedFilter === 'ALL'"
+          (click)="filterApplications('ALL')"
+        >
+          All
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="selectedFilter === 'PENDING'"
+          (click)="filterApplications('PENDING')"
+        >
+          Pending
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="selectedFilter === 'APPROVED'"
+          (click)="filterApplications('APPROVED')"
+        >
+          Approved
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="selectedFilter === 'REJECTED'"
+          (click)="filterApplications('REJECTED')"
+        >
+          Rejected
+        </button>
+      </div>
+    </div>
+
+    <div class="applications-container">
+      <!-- Loading State -->
+      <div *ngIf="isLoadingApplications" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading leave applications...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoadingApplications && filteredLeaveApplications.length === 0"
+        class="empty-state"
+      >
+        <svg
+          width="64"
+          height="64"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <p>
+          No
+          {{
+            selectedFilter === "ALL" ? "" : selectedFilter.toLowerCase()
+          }}
+          leave applications found
+        </p>
+        <button class="btn btn-primary" (click)="navigateToLeaveApplication()">
+          Apply for Leave
+        </button>
+      </div>
+
+      <!-- Applications List -->
+      <div
+        *ngIf="!isLoadingApplications && filteredLeaveApplications.length > 0"
+        class="applications-list"
+      >
+        <div
+          class="application-card"
+          *ngFor="let application of filteredLeaveApplications"
+        >
+          <div class="card-header">
+            <div class="leave-type-badge">
+              <span class="badge">{{ application.LeaveTypeName }}</span>
+            </div>
+            <span
+              class="status-badge"
+              [ngClass]="getStatusClass(application.Status)"
+            >
+              {{ application.Status }}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <div class="date-range">
+              <div class="date-item">
+                <label>From</label>
+                <span>{{ formatDate(application.FromDate) }}</span>
+              </div>
+              <div class="date-separator">→</div>
+              <div class="date-item">
+                <label>To</label>
+                <span>{{ formatDate(application.ToDate) }}</span>
+              </div>
+              <div class="duration">
+                <label>Duration</label>
+                <span
+                  >{{
+                    application.CalculatedDays ||
+                      calculateDuration(
+                        application.FromDate,
+                        application.ToDate
+                      )
+                  }}
+                  days</span
+                >
+              </div>
+            </div>
+
+            <div class="reason-section" *ngIf="application.Reason">
+              <label>Reason:</label>
+              <p>{{ application.Reason }}</p>
+            </div>
+
+            <div class="application-meta">
+              <div class="meta-item">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Applied on {{ formatDate(application.AppliedAt) }}</span>
+              </div>
+              <div class="meta-item" *ngIf="application.ResponseAt">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span
+                  >Processed on {{ formatDate(application.ResponseAt) }}</span
+                >
+              </div>
+            </div>
+
+            <div
+              class="rejection-reason"
+              *ngIf="
+                application.Status === 'REJECTED' && application.RejectionReason
+              "
+            >
+              <strong>Rejection Reason:</strong>
+              <p>{{ application.RejectionReason }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

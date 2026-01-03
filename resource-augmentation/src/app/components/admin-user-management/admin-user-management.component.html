@@ -1,0 +1,525 @@
+<div class="container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>User Management</h1>
+      <p>Create and manage user accounts</p>
+    </div>
+    <button class="back-button" (click)="backToDashboard()">
+      ← Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Alert Messages -->
+  <div class="alert success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+  <div class="alert error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Create User Form - WRAPPED IN FORM TAG -->
+  <div class="card">
+    <div class="section-header">
+      <h2>Create New User</h2>
+      <button
+        class="toggle-button"
+        [class.cancel]="showCreateForm"
+        (click)="toggleCreateForm()"
+      >
+        {{ showCreateForm ? "Cancel" : "Add User" }}
+      </button>
+    </div>
+
+    <div class="form-container" *ngIf="showCreateForm">
+      <!-- FORM TAG WRAPPING ALL INPUT FIELDS -->
+      <form #createUserFormRef="ngForm" (ngSubmit)="onCreateUser()" novalidate>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">First Name</label>
+            <input
+              type="text"
+              class="form-input"
+              name="firstName"
+              [(ngModel)]="createUserForm.firstName"
+              placeholder="Enter first name"
+              maxlength="50"
+              required
+              #firstNameInput="ngModel"
+            />
+            <div
+              class="error-message"
+              *ngIf="firstNameInput.invalid && firstNameInput.touched"
+            >
+              First name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Last Name</label>
+            <input
+              type="text"
+              class="form-input"
+              name="lastName"
+              [(ngModel)]="createUserForm.lastName"
+              placeholder="Enter last name"
+              maxlength="50"
+              required
+              #lastNameInput="ngModel"
+            />
+            <div
+              class="error-message"
+              *ngIf="lastNameInput.invalid && lastNameInput.touched"
+            >
+              Last name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email Address</label>
+            <input
+              type="email"
+              class="form-input"
+              name="email"
+              [(ngModel)]="createUserForm.email"
+              placeholder="Enter email address"
+              required
+              email
+              #emailInput="ngModel"
+            />
+            <div
+              class="error-message"
+              *ngIf="emailInput.invalid && emailInput.touched"
+            >
+              <span *ngIf="emailInput.errors?.['required']"
+                >Email is required</span
+              >
+              <span *ngIf="emailInput.errors?.['email']"
+                >Please enter a valid email address</span
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">User Role</label>
+            <select
+              class="form-select"
+              name="role"
+              [(ngModel)]="createUserForm.role"
+              required
+              #roleInput="ngModel"
+            >
+              <option value="">Select a role</option>
+              <option *ngFor="let role of userRoles" [value]="role">
+                {{ role }}
+              </option>
+            </select>
+            <div
+              class="error-message"
+              *ngIf="roleInput.invalid && roleInput.touched"
+            >
+              Please select a user role
+            </div>
+          </div>
+
+          <!-- Optional Manager Selection -->
+          <div class="form-group" *ngIf="createUserForm.role === 'RESOURCE'">
+            <label class="form-label">Assign Manager (Optional)</label>
+            <select
+              class="form-select"
+              name="managerId"
+              [(ngModel)]="createUserForm.managerId"
+            >
+              <option value="">No manager assigned</option>
+              <option
+                *ngFor="let manager of availableManagers"
+                [value]="manager.Id"
+              >
+                {{ manager.FirstName }} {{ manager.LastName }} ({{
+                  manager.Role
+                }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="toggleCreateForm()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn primary"
+            [disabled]="!createUserFormRef.valid || isLoading"
+          >
+            {{ isLoading ? "Creating..." : "Create User" }}
+          </button>
+        </div>
+      </form>
+      <!-- END OF FORM TAG -->
+    </div>
+  </div>
+
+  <!-- Users List -->
+  <div class="card">
+    <div class="users-list-header">
+      <h2>
+        Users
+        <span class="users-count">{{ users.length }}</span>
+      </h2>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading users...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && users.length === 0">
+      <h3>No Users Found</h3>
+      <p>Create your first user above to get started.</p>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-container" *ngIf="!isLoading && users.length > 0">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>
+              <div class="user-avatar">
+                <div class="avatar-circle">
+                  {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                </div>
+                <div class="user-info">
+                  <h4>{{ user.firstName }} {{ user.lastName }}</h4>
+                  <span>{{ user.email }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="type-badge" [ngClass]="user.role.toLowerCase()">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="
+                  getStatusText(
+                    user.isActive,
+                    user.isEmailVerified
+                  ).toLowerCase()
+                "
+              >
+                {{ getStatusText(user.isActive, user.isEmailVerified) }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn view" (click)="viewUser(user)">
+                  View
+                </button>
+                <button
+                  *ngIf="canDeleteUser(user)"
+                  class="action-btn manage"
+                  (click)="confirmDelete(user)"
+                >
+                  Delete
+                </button>
+                <span *ngIf="!canDeleteUser(user)" class="action-disabled">
+                  Cannot Delete
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- View User Details Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="showViewModal"
+    (click)="onOverlayClick($event)"
+  >
+    <div class="modal-container large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="user-avatar">{{
+            getUserInitials(selectedUserDetails)
+          }}</span>
+          User Details
+        </h2>
+        <button class="close-btn" (click)="closeViewModal()">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <div *ngIf="isLoadingUserDetails" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading user details...</p>
+        </div>
+
+        <div
+          *ngIf="!isLoadingUserDetails && selectedUserDetails"
+          class="details-grid"
+        >
+          <!-- Basic Information -->
+          <div class="detail-section">
+            <h3>Basic Information</h3>
+            <div class="detail-row">
+              <span class="detail-label">Full Name:</span>
+              <span class="detail-value"
+                >{{ selectedUserDetails.firstName }}
+                {{ selectedUserDetails.lastName }}</span
+              >
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email:</span>
+              <span class="detail-value">{{ selectedUserDetails.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Role:</span>
+              <span class="detail-value">
+                <span class="leave-type-badge">{{
+                  selectedUserDetails.role
+                }}</span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value">
+                <span
+                  class="days-badge"
+                  *ngIf="
+                    selectedUserDetails.isActive &&
+                    selectedUserDetails.isEmailVerified
+                  "
+                  >Active</span
+                >
+                <span
+                  class="half-day-badge"
+                  *ngIf="!selectedUserDetails.isEmailVerified"
+                  >Pending Verification</span
+                >
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Joined:</span>
+              <span class="detail-value">{{
+                formatDate(selectedUserDetails.createdAt)
+              }}</span>
+            </div>
+          </div>
+
+          <!-- Personal Details -->
+          <div class="detail-section" *ngIf="hasPersonalDetails()">
+            <h3>Personal Information</h3>
+            <div class="detail-row" *ngIf="selectedUserDetails.phone">
+              <span class="detail-label">Phone:</span>
+              <span class="detail-value">{{ selectedUserDetails.phone }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedUserDetails.dateOfBirth">
+              <span class="detail-label">Date of Birth:</span>
+              <span class="detail-value">{{
+                formatDate(selectedUserDetails.dateOfBirth)
+              }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedUserDetails.gender">
+              <span class="detail-label">Gender:</span>
+              <span class="detail-value">{{ selectedUserDetails.gender }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedUserDetails.address">
+              <span class="detail-label">Address:</span>
+              <span class="detail-value">{{
+                selectedUserDetails.address
+              }}</span>
+            </div>
+          </div>
+
+          <!-- Education Details -->
+          <div class="detail-section full-width" *ngIf="hasEducationDetails()">
+            <h3>
+              Education History ({{
+                selectedUserDetails.educations.length
+              }}
+              entries)
+            </h3>
+
+            <div
+              class="education-entry"
+              *ngFor="
+                let education of selectedUserDetails.educations;
+                let i = index
+              "
+            >
+              <div class="entry-header">
+                <h4>Education {{ i + 1 }}</h4>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Degree:</span>
+                <span class="detail-value">{{ education.Degree }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Field:</span>
+                <span class="detail-value">{{ education.FieldOfStudy }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Institution:</span>
+                <span class="detail-value">{{ education.Institution }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Period:</span>
+                <span class="detail-value">
+                  {{ formatDate(education.StartDate) }} -
+                  {{
+                    education.EndDate
+                      ? formatDate(education.EndDate)
+                      : "Present"
+                  }}
+                </span>
+              </div>
+              <div class="detail-row" *ngIf="education.Grade">
+                <span class="detail-label">Grade:</span>
+                <span class="detail-value">{{ education.Grade }}</span>
+              </div>
+              <div class="detail-row" *ngIf="education.Description">
+                <span class="detail-label">Description:</span>
+                <span class="detail-value">{{ education.Description }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Employment Details -->
+          <div class="detail-section full-width" *ngIf="hasEmploymentDetails()">
+            <h3>
+              Employment History ({{
+                selectedUserDetails.employments.length
+              }}
+              entries)
+            </h3>
+
+            <div
+              class="employment-entry"
+              *ngFor="
+                let employment of selectedUserDetails.employments;
+                let i = index
+              "
+            >
+              <div class="entry-header">
+                <h4>Employment {{ i + 1 }}</h4>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Job Title:</span>
+                <span class="detail-value">{{ employment.JobTitle }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Company:</span>
+                <span class="detail-value">{{ employment.CompanyName }}</span>
+              </div>
+              <div class="detail-row" *ngIf="employment.Location">
+                <span class="detail-label">Location:</span>
+                <span class="detail-value">{{ employment.Location }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Period:</span>
+                <span class="detail-value">
+                  {{ formatDate(employment.StartDate) }} -
+                  {{
+                    employment.EndDate
+                      ? formatDate(employment.EndDate)
+                      : "Present"
+                  }}
+                </span>
+              </div>
+              <div class="detail-row" *ngIf="employment.Description">
+                <span class="detail-label">Description:</span>
+                <span class="detail-value">{{ employment.Description }}</span>
+              </div>
+              <div
+                class="detail-row"
+                *ngIf="employment.Skills && employment.Skills.length > 0"
+              >
+                <span class="detail-label">Skills:</span>
+                <div class="detail-value">
+                  <span
+                    class="detail-badge leave-type"
+                    *ngFor="let skill of employment.Skills"
+                    >{{ skill }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="!isLoadingUserDetails && !selectedUserDetails"
+            class="empty-state"
+          >
+            <p>Failed to load user details.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn secondary" (click)="closeViewModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      class="modal-overlay"
+      *ngIf="showDeleteModal"
+      (click)="onOverlayClick($event)"
+    >
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Delete User</h2>
+          <button class="close-btn" (click)="cancelDelete()">&times;</button>
+        </div>
+
+        <div class="modal-content">
+          <div class="warning-message">
+            <p>
+              Are you sure you want to delete
+              <strong>"{{ deleteUserName }}"</strong>?
+            </p>
+            <p>This action cannot be undone and will permanently remove:</p>
+            <ul class="warning-list">
+              <li>User profile and personal information</li>
+              <li>Leave records and balance history</li>
+              <li>Employment and education details</li>
+              <li>All associated data and relationships</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn secondary" (click)="cancelDelete()">Cancel</button>
+          <button
+            class="btn danger"
+            (click)="deleteUser()"
+            [disabled]="isLoading"
+          >
+            {{ isLoading ? "Deleting..." : "Delete User" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/PanchalNihar/ResourceAugmented-Backend#readme",
+  "bugs": {
+    "url": "https://github.com/PanchalNihar/ResourceAugmented-Backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PanchalNihar/ResourceAugmented-Backend.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "@ng-bootstrap/ng-bootstrap": "^19.0.1",
+    "angular-calendar": "^0.32.0",
+    "angularx-flatpickr": "^8.1.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "flatpickr": "^4.6.13",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.5",
+    "pdfkit": "^0.17.2",
+    "puppeteer": "^24.31.0",
+    "resend": "^6.6.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

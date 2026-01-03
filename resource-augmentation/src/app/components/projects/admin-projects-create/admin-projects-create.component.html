@@ -1,0 +1,370 @@
+<div class="create-project-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="onCancel()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back
+      </button>
+      <div>
+        <h1 class="page-title">Create New Project</h1>
+        <p class="page-subtitle">Add a new project to the system</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-error">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="project-form">
+    
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h2 class="section-title">Basic Information</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="projectName" class="form-label">
+            Project Name <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="projectName"
+            formControlName="projectName"
+            class="form-input"
+            [class.invalid]="isFieldInvalid('projectName')"
+            placeholder="Enter project name"
+          />
+          <div *ngIf="isFieldInvalid('projectName')" class="error-message">
+            {{ getFieldError('projectName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="projectCode" class="form-label">
+            Project Code <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="projectCode"
+            formControlName="projectCode"
+            class="form-input"
+            [class.invalid]="isFieldInvalid('projectCode')"
+            placeholder="e.g., PROJ-2025-001"
+          />
+          <div *ngIf="isFieldInvalid('projectCode')" class="error-message">
+            {{ getFieldError('projectCode') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="clientName" class="form-label">Client Name</label>
+          <input
+            type="text"
+            id="clientName"
+            formControlName="clientName"
+            class="form-input"
+            placeholder="Enter client name (optional)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="projectType" class="form-label">
+            Project Type <span class="required">*</span>
+          </label>
+          <select
+            id="projectType"
+            formControlName="projectType"
+            class="form-select"
+          >
+            <option value="CLIENT">Client Project</option>
+            <option value="INTERNAL">Internal Project</option>
+            <option value="RND">R&D Project</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">
+          Description <span class="required">*</span>
+        </label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-textarea"
+          [class.invalid]="isFieldInvalid('description')"
+          rows="4"
+          placeholder="Enter project description"
+        ></textarea>
+        <div *ngIf="isFieldInvalid('description')" class="error-message">
+          {{ getFieldError('description') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Details Section -->
+    <div class="form-section">
+      <h2 class="section-title">Project Details</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="managerId" class="form-label">
+            Project Manager <span class="required">*</span>
+          </label>
+          <select
+            id="managerId"
+            formControlName="managerId"
+            class="form-select"
+            [class.invalid]="isFieldInvalid('managerId')"
+          >
+            <option value="">Select a manager</option>
+            <option *ngFor="let manager of managers" [value]="manager.Id">
+              {{ manager.Name }} ({{ manager.Email }})
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('managerId')" class="error-message">
+            {{ getFieldError('managerId') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="priority" class="form-label">
+            Priority <span class="required">*</span>
+          </label>
+          <select
+            id="priority"
+            formControlName="priority"
+            class="form-select"
+          >
+            <option *ngFor="let priority of priorities" [value]="priority">
+              {{ priority }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="status" class="form-label">
+            Status <span class="required">*</span>
+          </label>
+          <select
+            id="status"
+            formControlName="status"
+            class="form-select"
+          >
+            <option *ngFor="let status of projectStatuses" [value]="status">
+              {{ status.replace('_', ' ') }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="projectLocation" class="form-label">Project Location</label>
+          <input
+            type="text"
+            id="projectLocation"
+            formControlName="projectLocation"
+            class="form-input"
+            placeholder="e.g., Remote, Bangalore, USA"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate" class="form-label">
+            Start Date <span class="required">*</span>
+          </label>
+          <input
+            type="date"
+            id="startDate"
+            formControlName="startDate"
+            class="form-input"
+            [class.invalid]="isFieldInvalid('startDate')"
+          />
+          <div *ngIf="isFieldInvalid('startDate')" class="error-message">
+            {{ getFieldError('startDate') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate" class="form-label">End Date</label>
+          <input
+            type="date"
+            id="endDate"
+            formControlName="endDate"
+            class="form-input"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="estimatedBudget" class="form-label">Estimated Budget</label>
+          <input
+            type="number"
+            id="estimatedBudget"
+            formControlName="estimatedBudget"
+            class="form-input"
+            placeholder="Enter budget"
+            min="0"
+            step="0.01"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="currency" class="form-label">Currency</label>
+          <select
+            id="currency"
+            formControlName="currency"
+            class="form-select"
+          >
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="INR">INR</option>
+            <option value="GBP">GBP</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="domain" class="form-label">Domain/Industry</label>
+          <input
+            type="text"
+            id="domain"
+            formControlName="domain"
+            class="form-input"
+            placeholder="e.g., Healthcare, Finance, E-commerce"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="projectStack" class="form-label">Tech Stack Summary</label>
+          <input
+            type="text"
+            id="projectStack"
+            formControlName="projectStack"
+            class="form-input"
+            placeholder="e.g., MEAN Stack, MERN Stack"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="documentationUrl" class="form-label">Documentation URL</label>
+          <input
+            type="url"
+            id="documentationUrl"
+            formControlName="documentationUrl"
+            class="form-input"
+            placeholder="https://docs.example.com"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="repositoryUrl" class="form-label">Repository URL</label>
+          <input
+            type="url"
+            id="repositoryUrl"
+            formControlName="repositoryUrl"
+            class="form-input"
+            placeholder="https://github.com/..."
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Technologies Section -->
+    <div class="form-section">
+      <h2 class="section-title">Technologies</h2>
+      
+      <!-- Common Technologies -->
+      <div class="tech-suggestions">
+        <p class="tech-label">Quick Add:</p>
+        <div class="tech-chips">
+          <button
+            *ngFor="let tech of commonTechnologies"
+            type="button"
+            class="tech-chip"
+            (click)="addCommonTechnology(tech)"
+          >
+            + {{ tech }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected Technologies -->
+      <div class="tech-list" *ngIf="technologies.length > 0">
+        <div *ngFor="let tech of technologies.controls; let i = index" class="tech-item">
+          <input
+            [formControl]="$any(tech)"
+            type="text"
+            class="tech-input"
+            placeholder="Technology name"
+          />
+          <button
+            type="button"
+            class="btn-remove"
+            (click)="removeTechnology(i)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn-add-tech"
+        (click)="addTechnology()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Custom Technology
+      </button>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="submitting"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="submitting || projectForm.invalid"
+      >
+        <span *ngIf="!submitting">Create Project</span>
+        <span *ngIf="submitting" class="spinner-container">
+          <span class="spinner"></span>
+          Creating...
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

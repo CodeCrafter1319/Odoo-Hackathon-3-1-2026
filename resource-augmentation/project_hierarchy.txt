@@ -1,0 +1,77 @@
+resource-augmentation/
+├── .editorconfig
+├── .gitignore
+├── angular.json
+├── package-lock.json
+├── package.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.spec.json
+├── .angular/ (ignored: cache)
+├── .vscode/
+│   ├── extensions.json
+│   ├── launch.json
+│   └── tasks.json
+├── public/
+│   └── favicon.ico
+├── src/
+│   ├── index.html
+│   ├── main.server.ts
+│   ├── main.ts
+│   ├── server.ts
+│   ├── styles.css
+│   ├── app/
+│   │   ├── app.component.css
+│   │   ├── app.component.html
+│   │   ├── app.component.spec.ts
+│   │   ├── app.component.ts
+│   │   ├── app.config.server.ts
+│   │   ├── app.config.ts
+│   │   ├── app.routes.server.ts
+│   │   ├── app.routes.ts
+│   │   ├── components/
+│   │   │   ├── admin-dashboard/ (...)
+│   │   │   ├── admin-user-management/ (...)
+│   │   │   ├── company-dashboard/ (...)
+│   │   │   ├── email-verification/ (...)
+│   │   │   ├── leave-application/ (...)
+│   │   │   ├── leave-approvals/ (...)
+│   │   │   ├── leave-calendar/ (...)
+│   │   │   ├── leave-management/ (...)
+│   │   │   ├── login/ (...)
+│   │   │   ├── main-layout/ (...)
+│   │   │   ├── manager-dashboard/ (...)
+│   │   │   ├── profile-view/ (...)
+│   │   │   ├── profile-wizard/ (...)
+│   │   │   ├── register/ (...)
+│   │   │   ├── resource-dashboard/ (...)
+│   │   │   └── resume-designer/ (...)
+│   │   ├── core/
+│   │   │   ├── leave.model.ts
+│   │   │   └── user.model.ts
+│   │   ├── guards/
+│   │   │   ├── auth.guard.spec.ts
+│   │   │   ├── auth.guard.ts
+│   │   │   ├── role.guard.spec.ts
+│   │   │   └── role.guard.ts
+│   │   ├── interceptors/
+│   │   │   ├── auth.interceptor.spec.ts
+│   │   │   └── auth.interceptor.ts
+│   │   └── services/
+│   │       ├── auth.service.spec.ts
+│   │       ├── auth.service.ts
+│   │       ├── leave-calendar.service.spec.ts
+│   │       ├── leave-calendar.service.ts
+│   │       ├── leave.service.spec.ts
+│   │       ├── leave.service.ts
+│   │       ├── manager.service.spec.ts
+│   │       ├── manager.service.ts
+│   │       ├── role.service.spec.ts
+│   │       ├── role.service.ts
+│   │       ├── storage.service.spec.ts
+│   │       └── storage.service.ts
+│   └── assets/
+│       └── resume-templates/
+│           └── two-column.css
+└── node_modules/ (ignored)

@@ -1,0 +1,387 @@
+<div class="profile-view-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Loading your profile...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!isLoading && errorMessage">
+    <div class="error-icon">⚠️</div>
+    <h3>Unable to Load Profile</h3>
+    <p>{{ errorMessage }}</p>
+    <button class="btn primary" (click)="loadProfileData()">Try Again</button>
+  </div>
+
+  <!-- Profile Content -->
+  <ng-container *ngIf="!isLoading && !errorMessage && profileData">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="header-content">
+        <div class="user-avatar-large">{{ getUserInitials() }}</div>
+        <div class="user-info">
+          <h1 class="user-name">
+            {{ profileData.firstName }} {{ profileData.lastName }}
+          </h1>
+          <p class="user-role">{{ profileData.role }}</p>
+          <div class="user-meta">
+            <span class="status-badge" [ngClass]="getStatusClass()">
+              {{ getStatusText() }}
+            </span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              {{ profileData.email }}
+            </span>
+            <span class="meta-item" *ngIf="profileData.createdAt">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              Joined {{ formatDate(profileData.createdAt) }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn secondary" (click)="editProfile()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Profile
+        </button>
+        <button class="btn primary" (click)="toggleResumePreview()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          {{ showResumePreview ? 'Hide' : 'Preview' }} Resume
+        </button>
+        <button 
+          class="btn primary download-btn" 
+          (click)="downloadWithFallback()"
+          [disabled]="isDownloading"
+          [class.downloading]="isDownloading">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!isDownloading">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" *ngIf="isDownloading">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.25"/>
+            <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          {{ isDownloading ? 'Generating...' : 'Download Resume' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="profile-content">
+      <!-- Personal Details Section -->
+      <div class="profile-section" *ngIf="hasPersonalDetails()">
+        <div class="section-header">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <h2>Personal Information</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="info-grid">
+            <div class="info-item" *ngIf="profileData.phone">
+              <label>Phone</label>
+              <span>{{ profileData.phone }}</span>
+            </div>
+            <div class="info-item" *ngIf="profileData.dateOfBirth">
+              <label>Date of Birth</label>
+              <span>{{ formatDate(profileData.dateOfBirth) }}</span>
+            </div>
+            <div class="info-item" *ngIf="profileData.city">
+              <label>City</label>
+              <span>{{ profileData.city }}</span>
+            </div>
+            <div class="info-item" *ngIf="profileData.state">
+              <label>State</label>
+              <span>{{ profileData.state }}</span>
+            </div>
+            <div class="info-item" *ngIf="profileData.country">
+              <label>Country</label>
+              <span>{{ profileData.country }}</span>
+            </div>
+            <div class="info-item" *ngIf="profileData.zipCode">
+              <label>Zip Code</label>
+              <span>{{ profileData.zipCode }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="profileData.address">
+              <label>Address</label>
+              <span>{{ profileData.address }}</span>
+            </div>
+            <div class="info-item" *ngIf="profileData.linkedInProfile">
+              <label>LinkedIn</label>
+              <a [href]="profileData.linkedInProfile" target="_blank" class="external-link">
+                View Profile
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+            <div class="info-item" *ngIf="profileData.gitHubProfile">
+              <label>GitHub</label>
+              <a [href]="profileData.gitHubProfile" target="_blank" class="external-link">
+                View Profile
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+            <div class="info-item" *ngIf="profileData.portfolioWebsite">
+              <label>Portfolio</label>
+              <a [href]="profileData.portfolioWebsite" target="_blank" class="external-link">
+                Visit Website
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Education Section -->
+      <div class="profile-section" *ngIf="hasEducationDetails()">
+        <div class="section-header">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+            <h2>Education</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="timeline">
+            <div class="timeline-item" *ngFor="let education of profileData.educations">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-title">{{ education.Degree }}</h3>
+                    <p class="card-subtitle">{{ education.Institution }}</p>
+                  </div>
+                  <span class="date-badge">
+                    {{ formatDate(education.StartDate) }} - {{ education.EndDate ? formatDate(education.EndDate) : 'Present' }}
+                  </span>
+                </div>
+                <div class="card-body">
+                  <p class="field-badge" *ngIf="education.FieldOfStudy">{{ education.FieldOfStudy }}</p>
+                  <p class="grade-text" *ngIf="education.Grade">Grade: {{ education.Grade }}</p>
+                  <p class="description-text" *ngIf="education.Description">{{ education.Description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employment Section -->
+      <div class="profile-section" *ngIf="hasEmploymentDetails()">
+        <div class="section-header">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+            </svg>
+            <h2>Work Experience</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="timeline">
+            <div class="timeline-item" *ngFor="let employment of profileData.employments">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-title">{{ employment.JobTitle }}</h3>
+                    <p class="card-subtitle">{{ employment.CompanyName }}</p>
+                  </div>
+                  <span class="date-badge">
+                    {{ formatDate(employment.StartDate) }} - {{ employment.IsCurrentJob ? 'Present' : (employment.EndDate ? formatDate(employment.EndDate) : '') }}
+                  </span>
+                </div>
+                <div class="card-body">
+                  <p class="location-text" *ngIf="employment.Location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {{ employment.Location }}
+                  </p>
+                  <p class="description-text" *ngIf="employment.Description">{{ employment.Description }}</p>
+                  <div class="skills-showcase" *ngIf="employment.Skills && employment.Skills.length > 0">
+                    <span class="skill-badge" *ngFor="let skill of employment.Skills">{{ skill }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Languages Section -->
+      <div class="profile-section" *ngIf="hasLanguages()">
+        <div class="section-header">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+            </svg>
+            <h2>Languages</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="languages-grid">
+            <div class="language-card" *ngFor="let language of profileData.languages">
+              <div class="language-info">
+                <span class="language-name">{{ language.Name || language.Name }}</span>
+                <span class="language-level" [attr.data-level]="language.Level || language.Level">
+                  {{ language.Level || language.Level }}
+                </span>
+              </div>
+              <div class="proficiency-bar">
+                <div class="proficiency-fill" 
+                     [style.width]="
+                       (language.Level || language.Level) === 'NATIVE' ? '100%' : 
+                       (language.Level || language.Level) === 'FLUENT' ? '85%' :
+                       (language.Level || language.Level) === 'CONVERSATIONAL' ? '60%' : '35%'
+                     ">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certifications Section -->
+      <div class="profile-section" *ngIf="hasCertifications()">
+        <div class="section-header">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <h2>Certifications</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="cert-grid">
+            <div class="cert-card" *ngFor="let cert of profileData.certifications">
+              <div class="cert-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <div class="cert-content">
+                <h3 class="cert-title">{{ cert.Title || cert.Title }}</h3>
+                <p class="cert-org" *ngIf="cert.IssuingOrganization || cert.IssuingOrganization">
+                  {{ cert.IssuingOrganization || cert.IssuingOrganization }}
+                </p>
+                <div class="cert-meta">
+                  <span *ngIf="cert.IssueDate || cert.IssueDate">
+                    Issued: {{ formatDate(cert.IssueDate || cert.IssueDate) }}
+                  </span>
+                  <span *ngIf="cert.ExpiryDate || cert.ExpiryDate" class="expiry">
+                    Expires: {{ formatDate(cert.ExpiryDate || cert.ExpiryDate) }}
+                  </span>
+                </div>
+                <p class="cert-id" *ngIf="cert.CredentialId || cert.CredentialId">
+                  ID: {{ cert.CredentialId || cert.CredentialId }}
+                </p>
+                <p class="cert-desc" *ngIf="cert.Description || cert.Description">
+                  {{ cert.Description || cert.Description }}
+                </p>
+                <a *ngIf="cert.Link || cert.Link" [href]="cert.Link || cert.Link" target="_blank" class="cert-link">
+                  View Credential
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects Section -->
+      <div class="profile-section" *ngIf="hasProjects()">
+        <div class="section-header">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+            </svg>
+            <h2>Projects</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="projects-grid">
+            <div class="project-card" *ngFor="let project of profileData.projects">
+              <div class="project-header">
+                <h3 class="project-title">{{ project.Title || project.Title }}</h3>
+                <span class="project-status" *ngIf="project.IsOngoing || project.IsOngoing">
+                  <span class="pulse-dot"></span>
+                  Ongoing
+                </span>
+              </div>
+              <p class="project-date">
+                {{ formatDate(project.StartDate || project.StartDate) || 'Started' }} - 
+                {{ (project.IsOngoing || project.IsOngoing) ? 'Present' : (formatDate(project.EndDate || project.EndDate) || 'Completed') }}
+              </p>
+              <p class="project-desc" *ngIf="project.Description || project.Description">
+                {{ project.Description || project.Description }}
+              </p>
+              <div class="tech-stack" *ngIf="project.Technologies && project.Technologies.length > 0">
+                <span class="tech-tag" *ngFor="let tech of project.Technologies">{{ tech }}</span>
+              </div>
+              <a *ngIf="project.Link || project.Link" [href]="project.Link || project.Link" target="_blank" class="project-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                </svg>
+                View Project
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resume Preview Section -->
+    <div class="resume-preview-section" *ngIf="showResumePreview">
+      <div class="preview-container">
+        <div class="preview-header">
+          <h2>Resume Preview</h2>
+          <p class="preview-note">This is how your resume will appear when downloaded</p>
+        </div>
+        <div class="preview-content">
+          <app-resume-designer [profile]="profileData"></app-resume-designer>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

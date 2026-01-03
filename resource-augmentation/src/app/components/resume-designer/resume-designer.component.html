@@ -1,0 +1,118 @@
+<div class="rd-cv-root">
+  <!-- ============ LEFT SIDEBAR ============ -->
+  <aside class="rd-sidebar">
+    <!-- Education in Sidebar -->
+    <div *ngIf="profile?.educations && profile.educations.length > 0">
+      <h2>EDUCATION</h2>
+      <div class="edu-block" *ngFor="let edu of profile.educations">
+        <span class="degree">{{ edu.Degree || edu.degree }}</span>
+        <span class="meta">{{ edu.Institution || edu.institution }}</span>
+        <span class="meta">
+          {{ fmtDate(edu.StartDate || edu.startDate) }} - 
+          {{ fmtDate(edu.EndDate || edu.endDate) || 'Present' }}
+        </span>
+        <span class="meta" *ngIf="edu.FieldOfStudy || edu.fieldOfStudy">
+          {{ edu.FieldOfStudy || edu.fieldOfStudy }}
+        </span>
+        <span class="meta" *ngIf="edu.Grade || edu.grade">
+          Grade: {{ edu.Grade || edu.grade }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Languages in Sidebar -->
+    <div *ngIf="profile?.languages && profile.languages.length > 0">
+      <h2>LANGUAGES</h2>
+      <div class="sidebar-item" *ngFor="let lang of profile.languages">
+        <span class="skill-category">{{ lang.Name || lang.name }}</span>
+        <span class="meta">{{ lang.Level || lang.level }}</span>
+      </div>
+    </div>
+
+    <!-- Certifications in Sidebar -->
+    <div *ngIf="profile?.certifications && profile.certifications.length > 0">
+      <h2>CERTIFICATIONS</h2>
+      <ul class="cert-list">
+        <li *ngFor="let cert of profile.certifications">
+          {{ cert.Title || cert.title }}
+          <span class="meta" style="display: block;" *ngIf="cert.IssuingOrganization || cert.issuingOrganization">
+            {{ cert.IssuingOrganization || cert.issuingOrganization }}
+          </span>
+          <span class="meta" style="display: block;" *ngIf="cert.IssueDate || cert.issueDate">
+            {{ fmtDate(cert.IssueDate || cert.issueDate) }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- ============ RIGHT MAIN CONTENT ============ -->
+  <main class="rd-main">
+    <!-- Header -->
+    <header>
+      <h1>{{ profile?.firstName || 'Your' }} {{ profile?.lastName || 'Name' }}</h1>
+      <div class="role-title" *ngIf="profile?.role">{{ profile.role }}</div>
+      <div class="contact-info">
+        <span *ngIf="profile?.email">{{ profile.email }}</span>
+        <span *ngIf="profile?.phone">{{ profile.phone }}</span>
+        <span *ngIf="profile?.city || profile?.country">
+          {{ profile.city }}<span *ngIf="profile.city && profile.country">, </span>{{ profile.country }}
+        </span>
+      </div>
+      <div class="contact-info" *ngIf="profile?.linkedInProfile || profile?.gitHubProfile || profile?.portfolioWebsite">
+        <a *ngIf="profile?.linkedInProfile" [href]="profile.linkedInProfile" target="_blank">LinkedIn</a>
+        <a *ngIf="profile?.gitHubProfile" [href]="profile.gitHubProfile" target="_blank">GitHub</a>
+        <a *ngIf="profile?.portfolioWebsite" [href]="profile.portfolioWebsite" target="_blank">Portfolio</a>
+      </div>
+    </header>
+
+    <!-- Profile Summary -->
+    <section *ngIf="profile?.summary || profile?.about">
+      <h2 class="section-title">PROFILE</h2>
+      <p class="profile-summary">{{ profile.summary || profile.about }}</p>
+    </section>
+
+    <!-- Experience -->
+    <section>
+      <h2 class="section-title">EXPERIENCE</h2>
+      <div *ngIf="profile?.employments && profile.employments.length > 0; else noExperience">
+        <div class="job-block" *ngFor="let job of profile.employments">
+          <div class="job-header">
+            <span class="job-title">{{ job.JobTitle || job.jobTitle }}</span>
+            <span class="date-range">
+              {{ fmtDate(job.StartDate || job.startDate) }} - 
+              {{ job.IsCurrentJob ? 'Present' : fmtDate(job.EndDate || job.endDate) }}
+            </span>
+          </div>
+          <span class="company-name">{{ job.CompanyName || job.companyName }}</span>
+          <span class="meta" *ngIf="job.Location || job.location">{{ job.Location || job.location }}</span>
+          <p *ngIf="job.Description || job.description">{{ job.Description || job.description }}</p>
+          <ul *ngIf="job.Skills && job.Skills.length">
+            <li *ngFor="let skill of job.Skills">{{ skill }}</li>
+          </ul>
+        </div>
+      </div>
+      <ng-template #noExperience>
+        <p class="meta">No employment history listed</p>
+      </ng-template>
+    </section>
+
+    <!-- Projects -->
+    <section *ngIf="profile?.projects && profile.projects.length > 0">
+      <h2 class="section-title">PROJECTS</h2>
+      <div class="project-block" *ngFor="let proj of profile.projects">
+        <div class="job-header">
+          <span class="job-title">{{ proj.Title || proj.title }}</span>
+          <span class="date-range">
+            {{ fmtDate(proj.StartDate || proj.startDate) || 'Started' }} - 
+            {{ proj.IsOngoing ? 'Ongoing' : (fmtDate(proj.EndDate || proj.endDate) || 'Completed') }}
+          </span>
+        </div>
+        <p *ngIf="proj.Description || proj.description">{{ proj.Description || proj.description }}</p>
+        <ul *ngIf="proj.Technologies && proj.Technologies.length">
+          <li *ngFor="let tech of proj.Technologies">{{ tech }}</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>

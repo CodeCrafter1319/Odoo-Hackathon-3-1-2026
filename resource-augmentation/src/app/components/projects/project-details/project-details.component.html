@@ -1,0 +1,636 @@
+<div class="prd-container">
+  <!-- Header -->
+  <div class="prd-header">
+    <button class="btn-back" (click)="goBack()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Projects
+    </button>
+
+    <div class="header-actions" *ngIf="project && !loading">
+      <!-- ✅ Update Project Button (Admin only) -->
+      <button
+        *ngIf="canEditProject() && !isEditMode"
+        class="btn-back btn-update"
+        (click)="toggleEditMode()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+          ></path>
+          <path
+            d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+          ></path>
+        </svg>
+        Update Project
+      </button>
+
+      <button
+        *ngIf="canManageResources()"
+        class="btn btn-outline"
+        (click)="manageResources()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        Manage Team
+      </button>
+    </div>
+  </div>
+
+  <!-- Alert Messages -->
+  <div *ngIf="error" class="alert error">
+    <span>{{ error }}</span>
+    <button (click)="dismissError()" class="alert-close">&times;</button>
+  </div>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading project details...</p>
+  </div>
+
+  <!-- ✅ Edit Form (When in Edit Mode) -->
+  <div *ngIf="!loading && project && isEditMode" class="edit-form-container">
+    <div class="form-header">
+      <h2>Update Project Details</h2>
+      <button class="btn-cancel" (click)="cancelEdit()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Cancel
+      </button>
+    </div>
+
+    <form
+      [formGroup]="projectForm"
+      (ngSubmit)="updateProject()"
+      class="project-form"
+    >
+      <div class="form-grid">
+        <!-- Project Name -->
+        <div class="form-group">
+          <label for="projectName">
+            Project Name <span class="required">*</span>
+          </label>
+          <input
+            id="projectName"
+            type="text"
+            formControlName="ProjectName"
+            placeholder="Enter project name"
+            [class.error]="
+              projectForm.get('ProjectName')?.invalid &&
+              projectForm.get('ProjectName')?.touched
+            "
+          />
+          <span
+            class="error-message"
+            *ngIf="
+              projectForm.get('ProjectName')?.hasError('required') &&
+              projectForm.get('ProjectName')?.touched
+            "
+          >
+            Project name is required
+          </span>
+        </div>
+
+        <!-- Project Code -->
+        <div class="form-group">
+          <label for="projectCode">
+            Project Code <span class="required">*</span>
+          </label>
+          <input
+            id="projectCode"
+            type="text"
+            formControlName="ProjectCode"
+            placeholder="e.g., PROJ001"
+            [class.error]="
+              projectForm.get('ProjectCode')?.invalid &&
+              projectForm.get('ProjectCode')?.touched
+            "
+          />
+        </div>
+
+        <!-- Project Type - ✅ FIXED VALUES -->
+        <div class="form-group">
+          <label for="projectType">
+            Project Type <span class="required">*</span>
+          </label>
+          <select id="projectType" formControlName="ProjectType">
+            <option value="">Select type</option>
+            <option value="CLIENT">Client Project</option>
+            <option value="INTERNAL">Internal Project</option>
+            <option value="R&D">R&D Project</option>
+          </select>
+        </div>
+
+        <!-- Status - ✅ FIXED VALUES -->
+        <div class="form-group">
+          <label for="status"> Status <span class="required">*</span> </label>
+          <select id="status" formControlName="Status">
+            <option value="PLANNING">Planning</option>
+            <option value="ACTIVE">Active</option>
+            <option value="ON_HOLD">On Hold</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="priority">
+            Priority <span class="required">*</span>
+          </label>
+          <select id="priority" formControlName="Priority">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="CRITICAL">Critical</option>
+          </select>
+        </div>
+
+        <!-- Client Name -->
+        <div class="form-group">
+          <label for="clientName">Client Name</label>
+          <input
+            id="clientName"
+            type="text"
+            formControlName="ClientName"
+            placeholder="Enter client name"
+          />
+        </div>
+
+        <!-- Start Date -->
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input id="startDate" type="date" formControlName="StartDate" />
+        </div>
+
+        <!-- End Date -->
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input id="endDate" type="date" formControlName="EndDate" />
+        </div>
+
+        <!-- Budget -->
+        <div class="form-group">
+          <label for="budget">Estimated Budget</label>
+          <input
+            id="budget"
+            type="number"
+            formControlName="EstimatedBudget"
+            placeholder="0.00"
+            step="0.01"
+          />
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group">
+          <label for="currency">Currency</label>
+          <select id="currency" formControlName="Currency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="INR">INR</option>
+          </select>
+        </div>
+
+        <!-- Project Location -->
+        <div class="form-group">
+          <label for="location">Project Location</label>
+          <input
+            id="location"
+            type="text"
+            formControlName="ProjectLocation"
+            placeholder="e.g., New York, USA"
+          />
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="form-group">
+          <label for="techStack">Tech Stack</label>
+          <input
+            id="techStack"
+            type="text"
+            formControlName="ProjectStack"
+            placeholder="e.g., Angular, Node.js, MySQL"
+          />
+        </div>
+
+        <!-- Domain -->
+        <div class="form-group">
+          <label for="domain">Domain</label>
+          <input
+            id="domain"
+            type="text"
+            formControlName="Domain"
+            placeholder="e.g., Healthcare, Finance"
+          />
+        </div>
+
+        <!-- Documentation URL -->
+        <div class="form-group">
+          <label for="docsUrl">Documentation URL</label>
+          <input
+            id="docsUrl"
+            type="url"
+            formControlName="DocumentationUrl"
+            placeholder="https://..."
+          />
+        </div>
+
+        <!-- Repository URL -->
+        <div class="form-group">
+          <label for="repoUrl">Repository URL</label>
+          <input
+            id="repoUrl"
+            type="url"
+            formControlName="RepositoryUrl"
+            placeholder="https://github.com/..."
+          />
+        </div>
+
+        <!-- Description (Full Width) -->
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            formControlName="Description"
+            rows="4"
+            placeholder="Enter project description..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="cancelEdit()"
+          [disabled]="isSubmitting"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="projectForm.invalid || isSubmitting"
+        >
+          <span *ngIf="!isSubmitting">Update Project</span>
+          <span *ngIf="isSubmitting">Updating...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Project Details (Read-Only Mode) -->
+  <div *ngIf="!loading && project && !isEditMode" class="project-details">
+    <!-- Project Header Card -->
+    <div class="detail-card header-card">
+      <div class="card-header">
+        <div class="title-section">
+          <h1>{{ project.ProjectName }}</h1>
+          <span class="project-code">{{ project.ProjectCode }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(project.Status)">
+          {{ project.Status }}
+        </span>
+      </div>
+
+      <p class="project-description" *ngIf="project.Description">
+        {{ project.Description }}
+      </p>
+
+      <div class="badges-row">
+        <span
+          class="priority-badge"
+          [ngClass]="getPriorityClass(project.Priority)"
+        >
+          {{ project.Priority }} Priority
+        </span>
+        <span class="type-badge">{{ project.ProjectType }}</span>
+        <span class="location-badge" *ngIf="project.ProjectLocation">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          {{ project.ProjectLocation }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="details-grid">
+      <!-- Left Column -->
+      <div class="left-column">
+        <!-- Project Information -->
+        <div class="detail-card">
+          <h3 class="card-title">Project Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Client</span>
+              <span class="info-value">{{
+                project.ClientName || "Internal Project"
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Manager</span>
+              <span class="info-value">{{
+                project.ManagerName || "Unassigned"
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Start Date</span>
+              <span class="info-value">{{
+                formatDate(project.StartDate)
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">End Date</span>
+              <span class="info-value">{{ formatDate(project.EndDate) }}</span>
+            </div>
+            <div class="info-item" *ngIf="project.ProjectStack">
+              <span class="info-label">Tech Stack</span>
+              <span class="info-value">{{ project.ProjectStack }}</span>
+            </div>
+            <div class="info-item" *ngIf="project.Domain">
+              <span class="info-label">Domain</span>
+              <span class="info-value">{{ project.Domain }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Team Size</span>
+              <span class="info-value"
+                >{{ project.TotalResources || 0 }} members</span
+              >
+            </div>
+            <div class="info-item" *ngIf="project.EstimatedBudget">
+              <span class="info-label">Budget</span>
+              <span class="info-value"
+                >{{ project.Currency || "USD" }}
+                {{ project.EstimatedBudget | number }}</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Technologies -->
+        <div
+          class="detail-card"
+          *ngIf="project.Technologies && project.Technologies.length > 0"
+        >
+          <h3 class="card-title">Technologies</h3>
+          <div class="tech-tags">
+            <span *ngFor="let tech of project.Technologies" class="tech-tag">{{
+              tech
+            }}</span>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div
+          class="detail-card"
+          *ngIf="project.DocumentationUrl || project.RepositoryUrl"
+        >
+          <h3 class="card-title">Project Links</h3>
+          <div class="links-section">
+            <a
+              *ngIf="project.DocumentationUrl"
+              [href]="project.DocumentationUrl"
+              target="_blank"
+              class="project-link"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                ></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              Documentation
+            </a>
+            <a
+              *ngIf="project.RepositoryUrl"
+              [href]="project.RepositoryUrl"
+              target="_blank"
+              class="project-link"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                ></path>
+              </svg>
+              Repository
+            </a>
+          </div>
+        </div>
+
+        <!-- Your Assignment -->
+        <div
+          class="detail-card"
+          *ngIf="userRole === 'RESOURCE' && project.MyRole"
+        >
+          <h3 class="card-title">Your Assignment</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Your Role</span>
+              <span class="info-value">{{ project.MyRole }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Allocation</span>
+              <span class="info-value"
+                >{{ project.AllocationPercentage }}%</span
+              >
+            </div>
+            <div class="info-item" *ngIf="project.AssignedDate">
+              <span class="info-label">Assigned On</span>
+              <span class="info-value">{{
+                formatDate(project.AssignedDate)
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        <!-- Team Members -->
+        <div class="detail-card">
+          <div class="card-header-row">
+            <h3 class="card-title">Team Members</h3>
+            <span class="count-badge">{{
+              project.resources?.length || 0
+            }}</span>
+          </div>
+
+          <div
+            class="team-list"
+            *ngIf="project.resources && project.resources.length > 0"
+          >
+            <div *ngFor="let member of project.resources" class="team-member">
+              <div class="member-avatar">
+                {{ member.ResourceName.charAt(0) }}
+              </div>
+              <div class="member-info">
+                <div class="member-name">{{ member.ResourceName }}</div>
+                <div class="member-role">
+                  {{ member.Role || member.ResourceRole }}
+                </div>
+              </div>
+              <div class="member-allocation">
+                {{ member.AllocationPercentage }}%
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="empty-team"
+            *ngIf="!project.resources || project.resources.length === 0"
+          >
+            <p>No team members assigned yet</p>
+          </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="detail-card">
+          <h3 class="card-title">Recent Activity</h3>
+
+          <div
+            class="activity-list"
+            *ngIf="!loadingActivity && activities.length > 0"
+          >
+            <div
+              *ngFor="let activity of activities.slice(0, 10)"
+              class="activity-item"
+            >
+              <div class="activity-dot"></div>
+              <div class="activity-content">
+                <div class="activity-text">
+                  <strong>{{ activity.UserName }}</strong>
+                  {{ activity.Description }}
+                </div>
+                <div class="activity-time">
+                  {{ formatDateTime(activity.CreatedAt) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="loading-activity" *ngIf="loadingActivity">
+            <div class="spinner-sm"></div>
+            <span>Loading activity...</span>
+          </div>
+
+          <div
+            class="empty-activity"
+            *ngIf="!loadingActivity && activities.length === 0"
+          >
+            <p>No activity recorded yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Chat Button -->
+  <button
+    class="floating-chat-btn"
+    (click)="toggleChat()"
+    [class.active]="showChat"
+    title="Open Project Chat"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="black"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+      <line x1="7" y1="9" x2="17" y2="9" />
+      <line x1="7" y1="12" x2="17" y2="12" />
+      <line x1="7" y1="15" x2="14" y2="15" />
+    </svg>
+    <span class="chat-badge" *ngIf="!showChat && unreadCount > 0">{{
+      unreadCount
+    }}</span>
+  </button>
+
+  <!-- Chat Modal Overlay -->
+  <div class="chat-overlay" *ngIf="showChat" (click)="closeChat()"></div>
+
+  <!-- Chat Modal -->
+  <div class="chat-modal" *ngIf="showChat">
+    <app-project-chat
+      [projectId]="projectId"
+      [projectMembers]="projectMembers"
+      (closeChat)="closeChat()"
+    ></app-project-chat>
+  </div>
+</div>

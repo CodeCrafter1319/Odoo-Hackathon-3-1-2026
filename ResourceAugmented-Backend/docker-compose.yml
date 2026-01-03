@@ -1,0 +1,67 @@
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-prootpassword",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Node.js Backend Service
+  backend:
+    build: .
+    container_name: node_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - BROWSERLESS_WSEndpoint=${BROWSERLESS_WSEndpoint}
+      - PORT=3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge

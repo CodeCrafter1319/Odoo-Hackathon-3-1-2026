@@ -1,0 +1,186 @@
+<div class="about-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Resource Augmentation Platform</h1>
+      <p class="hero-subtitle">
+        Streamline employee management, profile building, and leave tracking—all in one powerful platform
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary" (click)="navigateToLogin()">Get Started</button>
+        <button class="btn-secondary" (click)="scrollToSection('how-it-works')">Learn More</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview Section -->
+  <section class="overview-section">
+    <div class="container">
+      <h2 class="section-title">What is Resource Augmentation?</h2>
+      <p class="section-description">
+        Resource Augmentation is a comprehensive platform designed to simplify HR operations and empower employees. 
+        From seamless onboarding to automated leave management, our system handles it all with role-based dashboards 
+        for Admins, Managers, and Employees.
+      </p>
+      
+      <div class="dashboard-types">
+        <div class="dashboard-card admin-card">
+          <div class="dashboard-icon">🔐</div>
+          <h3>Admin Dashboard</h3>
+          <p>Full control over user management, system settings, and organization-wide leave policies.</p>
+        </div>
+        <div class="dashboard-card manager-card">
+          <div class="dashboard-icon">👔</div>
+          <h3>Manager Dashboard</h3>
+          <p>Review leave requests, manage team availability, and track employee schedules effortlessly.</p>
+        </div>
+        <div class="dashboard-card resource-card">
+          <div class="dashboard-icon">👨‍💼</div>
+          <h3>Employee Dashboard</h3>
+          <p>Build your profile, apply for leaves, track balances, and generate professional CVs automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-description">
+        Follow these simple steps to get started and make the most of the platform
+      </p>
+
+      <div class="workflow-timeline">
+        <div class="workflow-step" *ngFor="let step of workflowSteps" [ngClass]="getUserTypeClass(step.userType)">
+          <div class="step-number">{{ step.number }}</div>
+          <div class="step-content">
+            <div class="step-header">
+              <h3>{{ step.title }}</h3>
+              <span class="user-badge" [ngClass]="getUserTypeClass(step.userType)">
+                {{ getUserTypeBadge(step.userType) }}
+              </span>
+            </div>
+            <p>{{ step.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-title">Key Features</h2>
+      <p class="section-description">
+        Everything you need to manage your workforce efficiently
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card" *ngFor="let feature of features">
+          <div class="feature-icon">{{ feature.icon }}</div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Leave Management Deep Dive -->
+  <section class="leave-management-section">
+    <div class="container">
+      <h2 class="section-title">Leave Management System</h2>
+      <div class="leave-details">
+        <div class="leave-detail-card">
+          <h3>🎯 Automatic Monthly Accruals</h3>
+          <p>
+            Leave balances are automatically credited to employee accounts every month. 
+            No manual intervention required—the system handles it seamlessly in the background.
+          </p>
+        </div>
+
+        <div class="leave-detail-card">
+          <h3>💰 Paid & Unpaid Leaves</h3>
+          <p>
+            Employees can apply for both paid and unpaid leaves. The system automatically calculates 
+            available balance and clearly indicates if any portion of the leave will be unpaid.
+          </p>
+        </div>
+
+        <div class="leave-detail-card">
+          <h3>⚡ Real-time Approval Workflow</h3>
+          <p>
+            When an employee applies for leave, their manager receives an instant email notification. 
+            Managers can approve or reject with comments, and employees are immediately notified.
+          </p>
+        </div>
+
+        <div class="leave-detail-card">
+          <h3>📅 Visual Calendar Interface</h3>
+          <p>
+            Managers and admins can view all team leaves on an interactive calendar, making it easy 
+            to identify availability conflicts and plan resource allocation.
+          </p>
+        </div>
+
+        <div class="leave-detail-card">
+          <h3>📊 Comprehensive Leave History</h3>
+          <p>
+            Every employee has access to their complete leave history with filters for pending, 
+            approved, and rejected applications, along with detailed reasons and manager comments.
+          </p>
+        </div>
+
+        <div class="leave-detail-card">
+          <h3>🔔 Email Notifications</h3>
+          <p>
+            All stakeholders stay informed with automated emails for leave applications, approvals, 
+            rejections, and reminders—ensuring nothing falls through the cracks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Future Features Section -->
+  <section class="future-section">
+    <div class="container">
+      <h2 class="section-title">Coming Soon</h2>
+      <p class="section-description">
+        We're constantly improving! Here's what's on the roadmap
+      </p>
+
+      <div class="future-features">
+        <div class="future-card">
+          <span class="coming-soon-badge">Coming Soon</span>
+          <h3>📱 Mobile App</h3>
+          <p>Access the platform on-the-go with dedicated iOS and Android applications.</p>
+        </div>
+        <div class="future-card">
+          <span class="coming-soon-badge">Coming Soon</span>
+          <h3>📈 Advanced Analytics</h3>
+          <p>Detailed insights and reports on leave patterns, team productivity, and resource utilization.</p>
+        </div>
+        <div class="future-card">
+          <span class="coming-soon-badge">Coming Soon</span>
+          <h3>🤖 AI-Powered Recommendations</h3>
+          <p>Smart suggestions for optimal leave planning based on historical data and team availability.</p>
+        </div>
+        <div class="future-card">
+          <span class="coming-soon-badge">Coming Soon</span>
+          <h3>🌐 Multi-Language Support</h3>
+          <p>Support for multiple languages to serve global teams effectively.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Transform Your HR Operations?</h2>
+      <p>Join hundreds of organizations already using Resource Augmentation Platform</p>
+      <button class="btn-cta" (click)="navigateToLogin()">Sign In Now</button>
+    </div>
+  </section>
+</div>

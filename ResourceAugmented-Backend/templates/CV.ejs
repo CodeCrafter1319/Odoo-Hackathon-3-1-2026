@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume - <%= profile.firstName %> <%= profile.lastName %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid #374151;
+    }
+
+    .name {
+      font-size: 32px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+
+    .contact-info {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .contact-info span {
+      margin: 0 10px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e5e7eb;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Profile Summary */
+    .summary {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.7;
+    }
+
+    /* Experience & Education */
+    .timeline-item {
+      margin-bottom: 20px;
+      padding-left: 15px;
+      border-left: 2px solid #e5e7eb;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .item-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .item-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .item-date {
+      font-size: 13px;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+
+    .item-description {
+      font-size: 13px;
+      color: #374151;
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    /* Skills */
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .skill-tag {
+      background: #f3f4f6;
+      color: #374151;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Languages */
+    .languages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .language-item {
+      font-size: 13px;
+      color: #374151;
+    }
+
+    .language-name {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .language-level {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* Certifications */
+    .cert-item {
+      margin-bottom: 15px;
+      padding-left: 15px;
+      border-left: 2px solid #e5e7eb;
+    }
+
+    .cert-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .cert-org {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+
+    .cert-date {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 3px;
+    }
+
+    .cert-id {
+      font-size: 12px;
+      color: #6b7280;
+      font-family: monospace;
+      margin-top: 3px;
+    }
+
+    /* Projects */
+    .project-item {
+      margin-bottom: 18px;
+      padding-left: 15px;
+      border-left: 2px solid #e5e7eb;
+    }
+
+    .project-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .project-date {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+
+    .project-desc {
+      font-size: 13px;
+      color: #374151;
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tech-tag {
+      background: #f3f4f6;
+      color: #374151;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Empty State */
+    .empty-state {
+      font-size: 13px;
+      color: #9ca3af;
+      font-style: italic;
+      padding: 10px 0;
+    }
+
+    /* Page Break */
+    @media print {
+      .section {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="name"><%= profile.firstName %> <%= profile.lastName %></h1>
+      <div class="contact-info">
+        <% if (profile.email) { %><span><%= profile.email %></span><% } %>
+        <% if (profile.phone) { %><span>•</span><span><%= profile.phone %></span><% } %>
+        <% if (profile.city || profile.country) { %>
+          <span>•</span>
+          <span>
+            <%= profile.city %><% if (profile.city && profile.country) { %>, <% } %><%= profile.country %>
+          </span>
+        <% } %>
+      </div>
+      <% if (profile.linkedInProfile || profile.gitHubProfile || profile.portfolioWebsite) { %>
+        <div class="contact-info" style="margin-top: 8px;">
+          <% if (profile.linkedInProfile) { %><span><%= profile.linkedInProfile %></span><% } %>
+          <% if (profile.gitHubProfile) { %>
+            <% if (profile.linkedInProfile) { %><span>•</span><% } %>
+            <span><%= profile.gitHubProfile %></span>
+          <% } %>
+          <% if (profile.portfolioWebsite) { %>
+            <% if (profile.linkedInProfile || profile.gitHubProfile) { %><span>•</span><% } %>
+            <span><%= profile.portfolioWebsite %></span>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Profile Summary -->
+    <% if (profile.summary || profile.about) { %>
+      <div class="section">
+        <h2 class="section-title">Profile</h2>
+        <p class="summary"><%= profile.summary || profile.about %></p>
+      </div>
+    <% } %>
+
+    <!-- Experience -->
+    <div class="section">
+      <h2 class="section-title">Experience</h2>
+      <% if (profile.employments && profile.employments.length) { %>
+        <% profile.employments.forEach(function(job) { %>
+          <div class="timeline-item">
+            <div class="item-header">
+              <div>
+                <div class="item-title"><%= job.JobTitle || job.jobTitle || '—' %></div>
+                <div class="item-subtitle"><%= job.CompanyName || job.companyName || '—' %></div>
+              </div>
+              <div class="item-date">
+                <%= job.StartDate ? new Date(job.StartDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : '' %>
+                - 
+                <%= job.IsCurrentJob ? 'Present' : (job.EndDate ? new Date(job.EndDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : 'Present') %>
+              </div>
+            </div>
+            <% if (job.Location || job.location) { %>
+              <div class="item-subtitle"><%= job.Location || job.location %></div>
+            <% } %>
+            <% if (job.Description || job.description) { %>
+              <p class="item-description"><%= job.Description || job.description %></p>
+            <% } %>
+            <% if (job.Skills && job.Skills.length) { %>
+              <div class="skills-list">
+                <% job.Skills.forEach(function(skill) { %>
+                  <span class="skill-tag"><%= skill %></span>
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p class="empty-state">No employment history listed</p>
+      <% } %>
+    </div>
+
+    <!-- Education -->
+    <div class="section">
+      <h2 class="section-title">Education</h2>
+      <% if (profile.educations && profile.educations.length) { %>
+        <% profile.educations.forEach(function(edu) { %>
+          <div class="timeline-item">
+            <div class="item-header">
+              <div>
+                <div class="item-title"><%= edu.Degree || edu.degree || '—' %></div>
+                <div class="item-subtitle"><%= edu.Institution || edu.institution || '—' %></div>
+              </div>
+              <div class="item-date">
+                <%= edu.StartDate ? new Date(edu.StartDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : '' %>
+                - 
+                <%= edu.EndDate ? new Date(edu.EndDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : 'Present' %>
+              </div>
+            </div>
+            <% if (edu.FieldOfStudy || edu.fieldOfStudy) { %>
+              <div class="item-subtitle"><%= edu.FieldOfStudy || edu.fieldOfStudy %></div>
+            <% } %>
+            <% if (edu.Grade || edu.grade) { %>
+              <p class="item-description">Grade: <%= edu.Grade || edu.grade %></p>
+            <% } %>
+            <% if (edu.Description || edu.description) { %>
+              <p class="item-description"><%= edu.Description || edu.description %></p>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p class="empty-state">No education records listed</p>
+      <% } %>
+    </div>
+
+    <!-- Projects -->
+    <% if (profile.projects && profile.projects.length) { %>
+      <div class="section">
+        <h2 class="section-title">Projects</h2>
+        <% profile.projects.forEach(function(proj) { %>
+          <div class="project-item">
+            <div class="project-title"><%= proj.Title || proj.title %></div>
+            <div class="project-date">
+              <%= proj.StartDate ? new Date(proj.StartDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : 'Started' %>
+              - 
+              <%= proj.IsOngoing ? 'Ongoing' : (proj.EndDate ? new Date(proj.EndDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : 'Completed') %>
+            </div>
+            <% if (proj.Description || proj.description) { %>
+              <p class="project-desc"><%= proj.Description || proj.description %></p>
+            <% } %>
+            <% if (proj.Technologies && proj.Technologies.length) { %>
+              <div class="tech-stack">
+                <% proj.Technologies.forEach(function(tech) { %>
+                  <span class="tech-tag"><%= tech %></span>
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <!-- Certifications -->
+    <% if (profile.certifications && profile.certifications.length) { %>
+      <div class="section">
+        <h2 class="section-title">Certifications</h2>
+        <% profile.certifications.forEach(function(cert) { %>
+          <div class="cert-item">
+            <div class="cert-title"><%= cert.Title || cert.title %></div>
+            <% if (cert.IssuingOrganization || cert.issuingOrganization) { %>
+              <div class="cert-org"><%= cert.IssuingOrganization || cert.issuingOrganization %></div>
+            <% } %>
+            <% if (cert.IssueDate || cert.issueDate) { %>
+              <div class="cert-date">
+                Issued: <%= cert.IssueDate ? new Date(cert.IssueDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : '' %>
+                <% if (cert.ExpiryDate || cert.expiryDate) { %>
+                  • Expires: <%= cert.ExpiryDate ? new Date(cert.ExpiryDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short'}) : '' %>
+                <% } %>
+              </div>
+            <% } %>
+            <% if (cert.CredentialId || cert.credentialId) { %>
+              <div class="cert-id">ID: <%= cert.CredentialId || cert.credentialId %></div>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <!-- Languages -->
+    <% if (profile.languages && profile.languages.length) { %>
+      <div class="section">
+        <h2 class="section-title">Languages</h2>
+        <div class="languages-grid">
+          <% profile.languages.forEach(function(lang) { %>
+            <div class="language-item">
+              <span class="language-name"><%= lang.Name || lang.name %></span>
+              <span class="language-level"> - <%= lang.Level || lang.level %></span>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

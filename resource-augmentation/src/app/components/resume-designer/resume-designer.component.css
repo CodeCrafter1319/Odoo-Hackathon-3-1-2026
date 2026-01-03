@@ -1,0 +1,476 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.rd-cv-root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 10pt;
+  color: #333;
+  display: grid;
+  grid-template-columns: 32% 68%;
+  gap: 0;
+  background: white;
+  width: 100%;
+}
+
+/* Sidebar */
+.rd-sidebar,
+.sidebar {
+  background-color: #f4f6f8;
+  padding: 28px 20px;
+  color: #2c3e50;
+  /* REMOVED: border-right: 1px solid #e1e4e8; */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rd-sidebar h2 {
+  font-size: 11pt;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  /* REMOVED: border-bottom: 2px solid #2c3e50; */
+  padding-bottom: 5px;
+  margin-bottom: 12px;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.edu-block {
+  margin-bottom: 12px;
+}
+.degree {
+  font-weight: 700;
+  display: block;
+  font-size: 9.5pt;
+}
+.meta {
+  font-size: 9pt;
+  color: #666;
+  display: block;
+  margin-bottom: 2px;
+}
+.sidebar-item {
+  margin-bottom: 8px;
+}
+.skill-category {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9.5pt;
+  color: #444;
+}
+.skill-list {
+  font-size: 9.5pt;
+  margin-bottom: 10px;
+  color: #555;
+}
+.cert-list {
+  padding-left: 15px;
+  font-size: 9.5pt;
+  color: #555;
+  margin: 0 0 10px 0;
+}
+.cert-list li {
+  margin-bottom: 8px;
+  list-style: disc;
+}
+
+/* Main area */
+.rd-main {
+  padding: 28px 30px;
+}
+
+header {
+  margin-bottom: 18px;
+  /* REMOVED: border-bottom: 1px solid #eee; */
+  padding-bottom: 16px;
+}
+
+h1 {
+  font-size: 26pt;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+  line-height: 1;
+}
+
+.role-title {
+  font-size: 14pt;
+  font-weight: 300;
+  color: #7f8c8d;
+  margin-bottom: 8px;
+}
+
+.contact-info {
+  font-size: 9.5pt;
+  color: #555;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.contact-info a {
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: 600;
+  /* REMOVED: border-bottom: 1px dotted #ccc; */
+}
+
+.section-title {
+  font-size: 14pt;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e1e4e8;
+  margin-left: 12px;
+}
+
+.job-block,
+.project-block {
+  margin-bottom: 14px;
+}
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.job-title {
+  font-weight: 700;
+  font-size: 11pt;
+  color: #222;
+}
+.date-range {
+  font-size: 9.5pt;
+  color: #666;
+}
+.company-name {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #444;
+}
+li {
+  margin-bottom: 6px;
+}
+
+.profile-summary {
+  margin-top: 0;
+  color: #444;
+  font-size: 10pt;
+}
+
+/* responsive preview: scale card on small screens */
+:host(.preview-card-wrapper) .rd-cv-root {
+  width: 820px;
+  max-width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* print adjustments */
+@media print {
+  .rd-cv-root {
+    grid-template-columns: 32% 68%;
+  }
+  .rd-sidebar {
+    background-color: #f4f6f8 !important;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+}
+
+/* ===== profile-view.component.css - BORDERS REMOVED FROM PREVIEW ===== */
+
+/* Resume Preview Styles */
+.resume-preview-container {
+  margin: 1.2rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0 0.75rem 0;
+  /* REMOVED: border-bottom: 1px solid #e5e7eb; */
+}
+
+.preview-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.preview-heading h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.preview-heading .small-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Template select area aligned right */
+.preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.template-label {
+  font-size: 0.88rem;
+  color: #374151;
+  margin-right: 0.35rem;
+  white-space: nowrap;
+}
+
+.template-select {
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  /* REMOVED: border: 1px solid #e6e9ef; */
+  background: #ffffff;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 150px;
+}
+
+.template-select:hover {
+  /* REMOVED: border-color: #d1d5db; */
+  background: #f3f4f6;
+}
+
+.template-select:focus {
+  outline: none;
+  /* REMOVED: border-color: #374151; */
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
+}
+
+/* Card that contains the rendered resume */
+.rd-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.rd-preview-wrapper app-resume-designer,
+.rd-preview-wrapper .rd-preview-card {
+  width: 900px;
+  max-width: 100%;
+  border-radius: 8px;
+  background: #ffffff;
+  /* REMOVED: border: 1px solid #e9edf2; */
+  box-shadow: 0 10px 30px rgba(11, 22, 35, 0.08);
+  padding: 2.25rem;
+  min-height: 520px;
+  display: block;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+@media (max-width: 980px) {
+  .rd-preview-wrapper {
+    padding: 1rem 0;
+  }
+
+  .rd-preview-wrapper app-resume-designer,
+  .rd-preview-wrapper .rd-preview-card {
+    padding: 1.5rem;
+    min-height: 420px;
+    width: 100%;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .preview-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .rd-preview-wrapper app-resume-designer,
+  .rd-preview-wrapper .rd-preview-card {
+    padding: 1.2rem;
+  }
+}
+
+.btn.ghost.active,
+.btn.ghost[aria-pressed="true"] {
+  background: #f3f4f6;
+  /* REMOVED: border: 1px solid #e6e9ef; */
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.02);
+  color: #0f172a;
+  position: relative;
+}
+
+.btn.ghost.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #374151;
+}
+
+.resume-preview-container {
+  animation: fadeIn 250ms ease both;
+}
+
+.rd-preview-wrapper {
+  animation: fadeIn 300ms ease 100ms both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.small-note {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.preview-card {
+  width: 820px;
+  max-width: 100%;
+  background: #ffffff;
+  /* REMOVED: border: 1px solid #e5e7eb; */
+  border-radius: 8px;
+  padding: 1.6rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Projects */
+.rd-project-item {
+  margin-bottom: 16px;
+  padding-left: 12px;
+  border-left: 2px solid #e5e7eb;
+}
+
+.rd-project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+
+.rd-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.rd-tech-tag {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Certifications */
+.rd-cert-item {
+  margin-bottom: 14px;
+  padding-left: 12px;
+  border-left: 2px solid #e5e7eb;
+}
+
+.rd-cert-date {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 3px;
+}
+
+.rd-cert-id {
+  font-size: 11px;
+  color: #6b7280;
+  font-family: monospace;
+  margin-top: 3px;
+}
+
+/* Languages */
+.rd-languages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.rd-language-item {
+  font-size: 13px;
+  color: #374151;
+}
+
+.rd-language-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.rd-language-level {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Empty State */
+.rd-empty-state {
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 8px 0;
+}

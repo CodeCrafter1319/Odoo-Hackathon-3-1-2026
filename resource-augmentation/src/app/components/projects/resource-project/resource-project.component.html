@@ -1,0 +1,102 @@
+<div class="rd-container">
+  <!-- Header -->
+  <div class="rd-header">
+    <div>
+      <h1>My Projects</h1>
+      <p class="header-subtitle">Projects you are currently working on</p>
+    </div>
+  </div>
+
+  <!-- Alert Messages -->
+  <div *ngIf="error" class="alert error">
+    <span>{{ error }}</span>
+    <button (click)="dismissError()" class="alert-close">×</button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading your projects...</p>
+  </div>
+
+  <!-- Projects Grid -->
+  <div *ngIf="!loading && projects.length > 0" class="projects-grid">
+    <div *ngFor="let project of projects" class="project-card" (click)="viewProject(project.Id)">
+      <div class="project-header">
+        <div class="project-title-section">
+          <h3 class="project-title">{{ project.ProjectName }}</h3>
+          <span class="project-code">{{ project.ProjectCode }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(project.Status)">
+          {{ project.Status }}
+        </span>
+      </div>
+
+      <div class="project-body">
+        <div class="project-info-row">
+          <div class="info-item">
+            <span class="info-label">Client</span>
+            <span class="info-value">{{ project.ClientName || 'Internal' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Manager</span>
+            <span class="info-value">{{ project.ManagerName || 'Unassigned' }}</span>
+          </div>
+        </div>
+
+        <div class="project-info-row" *ngIf="project.MyRole">
+          <div class="info-item">
+            <span class="info-label">Your Role</span>
+            <span class="info-value">{{ project.MyRole }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Allocation</span>
+            <span class="info-value">{{ project.AllocationPercentage }}%</span>
+          </div>
+        </div>
+
+        <div class="project-dates">
+          <div class="date-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>{{ formatDate(project.StartDate) }} - {{ formatDate(project.EndDate) }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="project.Technologies && project.Technologies.length > 0" class="tech-tags">
+          <span *ngFor="let tech of project.Technologies.slice(0, 5)" class="tech-tag">
+            {{ tech }}
+          </span>
+          <span *ngIf="project.Technologies.length > 5" class="tech-tag more">
+            +{{ project.Technologies.length - 5 }}
+          </span>
+        </div>
+
+        <div *ngIf="project.Description" class="project-description">
+          <p>{{ project.Description }}</p>
+        </div>
+      </div>
+
+      <div class="project-footer">
+        <span class="priority-badge" [ngClass]="getPriorityClass(project.Priority)">
+          {{ project.Priority }} Priority
+        </span>
+        <button class="btn-view">View Details →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && projects.length === 0" class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+    </svg>
+    <h3>No Projects Assigned</h3>
+    <p>You haven't been assigned to any projects yet. Contact your manager for more information.</p>
+  </div>
+</div>

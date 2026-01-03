@@ -1,0 +1,274 @@
+<div class="leave-approvals-container">
+  <!-- Header Section -->
+  <div class="header">
+    <button class="btn secondary back-btn" (click)="goBackToDashboard()">
+      <span>←</span>
+      Back to Dashboard
+    </button>
+    <h1>Leave Approvals</h1>
+    <p>Review and approve leave requests from your team members</p>
+    
+    <!-- Actions -->
+    <div class="header-actions">
+      <button class="btn secondary" (click)="refreshData()" [disabled]="isLoading">
+        <span>↻</span>
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Alert Messages -->
+  <div *ngIf="errorMessage" class="alert error">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && pendingLeaveApprovals.length === 0" class="loading-state">
+    Loading pending approvals...
+  </div>
+
+  <!-- No Approvals State -->
+  <div *ngIf="!isLoading && pendingLeaveApprovals.length === 0" class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h3>No Pending Approvals</h3>
+    <p>All leave requests have been processed.</p>
+  </div>
+
+  <!-- Pending Approvals List -->
+  <div *ngIf="pendingLeaveApprovals.length > 0" class="approvals-section">
+    <h2>Pending Leave Requests ({{ pendingLeaveApprovals.length }})</h2>
+    <div class="approval-list">
+      <div *ngFor="let application of pendingLeaveApprovals" class="approval-item">
+        <div class="approval-info">
+          <div class="employee-name">{{ application.FirstName }} {{ application.LastName }}</div>
+          <div class="employee-email">{{ application.Email }}</div>
+          <div class="leave-details">
+            <span class="leave-type">{{ application.LeaveTypeName }}</span>
+            <span class="leave-dates">{{ application.FromDate | date:'shortDate' }} - {{ application.ToDate | date:'shortDate' }}</span>
+            <span class="leave-days">{{ application.TotalDays }} days</span>
+            <span *ngIf="application.HalfDay" class="half-day">Half Day</span>
+          </div>
+          <div class="leave-reason">
+            <strong>Reason:</strong> {{ application.Reason }}
+          </div>
+          <div class="applied-date">
+            <strong>Applied:</strong> {{ application.AppliedAt | date:'short' }}
+          </div>
+        </div>
+        <div class="approval-actions">
+          <button 
+            class="btn-action success" 
+            (click)="approveLeave(application.Id)" 
+            [disabled]="isLoading"
+            title="Approve Leave">
+            Approve
+          </button>
+          <button 
+            class="btn-action danger" 
+            (click)="rejectLeave(application.Id)" 
+            [disabled]="isLoading"
+            title="Reject Leave">
+            Reject
+          </button>
+          <button 
+            class="btn-action secondary" 
+            (click)="viewLeaveDetails(application)"
+            title="View Details">
+            Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Approval Modal -->
+<div *ngIf="showApprovalModal" class="modal-overlay" (click)="closeApprovalModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Approve Leave Request</h2>
+      <button class="close-btn" (click)="closeApprovalModal()">&times;</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="employee-info">
+        <h3>{{ selectedApplication?.FirstName }} {{ selectedApplication?.LastName }}</h3>
+        <div class="employee-details">
+          <span class="detail-badge leave-type">{{ selectedApplication?.LeaveTypeName }}</span>
+          <span class="detail-badge dates">{{ selectedApplication?.FromDate | date:'shortDate' }} - {{ selectedApplication?.ToDate | date:'shortDate' }}</span>
+          <span class="detail-badge days">{{ selectedApplication?.TotalDays }} days</span>
+        </div>
+        <div class="reason-preview">
+          <strong>Reason:</strong> {{ selectedApplication?.Reason }}
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="approvalComments" class="form-label">Approval Comments (Optional)</label>
+        <textarea
+          id="approvalComments"
+          [(ngModel)]="approvalComments"
+          class="form-textarea"
+          placeholder="Add any comments for approval (optional)"
+          rows="3">
+        </textarea>
+      </div>
+
+      <div class="info-message">
+        <p><strong>This action will:</strong></p>
+        <ul class="info-list">
+          <li>Mark the leave as approved</li>
+          <li>Deduct {{ selectedApplication?.TotalDays }} days from employee's leave balance</li>
+          <li>Send approval notification to {{ selectedApplication?.FirstName }}</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn secondary" (click)="closeApprovalModal()">Cancel</button>
+      <button 
+        class="btn primary" 
+        (click)="confirmApproval()"
+        [disabled]="isLoading">
+        Approve Leave
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Leave Modal -->
+<div *ngIf="showRejectModal" class="modal-overlay" (click)="closeRejectModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Reject Leave Request</h2>
+      <button class="close-btn" (click)="closeRejectModal()">&times;</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="employee-info">
+        <h3>{{ selectedApplication?.FirstName }} {{ selectedApplication?.LastName }}</h3>
+        <div class="employee-details">
+          <span class="detail-badge leave-type">{{ selectedApplication?.LeaveTypeName }}</span>
+          <span class="detail-badge dates">{{ selectedApplication?.FromDate | date:'shortDate' }} - {{ selectedApplication?.ToDate | date:'shortDate' }}</span>
+          <span class="detail-badge days">{{ selectedApplication?.TotalDays }} days</span>
+        </div>
+        <div class="reason-preview">
+          <strong>Reason:</strong> {{ selectedApplication?.Reason }}
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="rejectionReason" class="form-label required">Reason for Rejection</label>
+        <textarea
+          id="rejectionReason"
+          [(ngModel)]="rejectionReason"
+          class="form-textarea"
+          placeholder="Please provide a clear reason for rejecting this leave request..."
+          rows="4"
+          required>
+        </textarea>
+      </div>
+
+      <div class="warning-message">
+        <p><strong>This action will:</strong></p>
+        <ul class="warning-list">
+          <li>Mark the leave as rejected</li>
+          <li>Send rejection notification with your reason to {{ selectedApplication?.FirstName }}</li>
+          <li>No leave balance will be deducted</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn secondary" (click)="closeRejectModal()">Cancel</button>
+      <button 
+        class="btn danger" 
+        (click)="confirmRejection()" 
+        [disabled]="!rejectionReason.trim() || isLoading">
+        Reject Leave
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Leave Details Modal -->
+<div *ngIf="showDetailsModal" class="modal-overlay" (click)="closeDetailsModal()">
+  <div class="modal-container large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Leave Request Details</h2>
+      <button class="close-btn" (click)="closeDetailsModal()">&times;</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="details-grid">
+        <!-- Employee Information -->
+        <div class="detail-section">
+          <h3>Employee Information</h3>
+          <div class="detail-row">
+            <span class="detail-label">Name:</span>
+            <span class="detail-value">{{ selectedApplication?.FirstName }} {{ selectedApplication?.LastName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedApplication?.Email }}</span>
+          </div>
+        </div>
+
+        <!-- Leave Information -->
+        <div class="detail-section">
+          <h3>Leave Information</h3>
+          <div class="detail-row">
+            <span class="detail-label">Leave Type:</span>
+            <span class="detail-value leave-type-badge">{{ selectedApplication?.LeaveTypeName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">From Date:</span>
+            <span class="detail-value">{{ formatDate(selectedApplication?.FromDate) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">To Date:</span>
+            <span class="detail-value">{{ formatDate(selectedApplication?.ToDate) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Total Days:</span>
+            <span class="detail-value days-badge">{{ selectedApplication?.TotalDays }} days</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedApplication?.HalfDay">
+            <span class="detail-label">Half Day:</span>
+            <span class="detail-value half-day-badge">Yes</span>
+          </div>
+        </div>
+
+        <!-- Application Details -->
+        <div class="detail-section full-width">
+          <h3>Application Details</h3>
+          <div class="detail-row">
+            <span class="detail-label">Applied On:</span>
+            <span class="detail-value">{{ selectedApplication?.AppliedAt | date:'full' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Reason:</span>
+            <div class="detail-value reason-text">{{ selectedApplication?.Reason }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn secondary" (click)="closeDetailsModal()">Close</button>
+      <button 
+        class="btn danger" 
+        (click)="rejectLeave(selectedApplication?.Id); closeDetailsModal()">
+        Reject
+      </button>
+      <button 
+        class="btn primary" 
+        (click)="approveLeave(selectedApplication?.Id); closeDetailsModal()">
+        Approve
+      </button>
+    </div>
+  </div>
+</div>

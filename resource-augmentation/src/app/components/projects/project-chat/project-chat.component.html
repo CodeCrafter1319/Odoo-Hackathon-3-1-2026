@@ -1,0 +1,108 @@
+<!-- project-chat.component.html -->
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="header-left">
+      <h3>Project Chat</h3>
+      <span class="connection-status" [class.connected]="connected">
+        {{ connected ? '● Online' : '○ Offline' }}
+      </span>
+    </div>
+    <button class="close-btn" (click)="onClose()" aria-label="Close chat">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading chat history...</p>
+  </div>
+
+  <!-- Messages Container -->
+  <div *ngIf="!loading" class="chat-messages" #chatMessages>
+    <!-- Empty State -->
+    <div *ngIf="messages.length === 0" class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" 
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <p>No messages yet</p>
+      <small>Start the conversation!</small>
+    </div>
+
+    <!-- Messages -->
+    <div *ngFor="let message of messages" 
+         class="message-wrapper"
+         [class.my-message]="isMyMessage(message)">
+      <div class="message">
+        <div class="message-header">
+          <span class="sender-name">{{ isMyMessage(message) ? 'You' : message.userName }}</span>
+          <span class="sender-role" *ngIf="message.userRole">{{ message.userRole }}</span>
+        </div>
+        <div class="message-content" [innerHTML]="formatMessage(message.message)"></div>
+        <div class="message-footer">
+          <span class="timestamp">{{ formatTime(message.timestamp) }}</span>
+          <span *ngIf="message.isEdited" class="edited-badge">(edited)</span>
+        </div>
+        <button 
+          *ngIf="!isMyMessage(message)" 
+          class="reply-btn" 
+          (click)="replyToMessage(message)"
+          title="Reply">
+          ↩
+        </button>
+      </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div *ngIf="typingUsers.length > 0" class="typing-indicator">
+      <span *ngIf="typingUsers.length === 1">{{ typingUsers[0] }} is typing...</span>
+      <span *ngIf="typingUsers.length === 2">{{ typingUsers[0] }} and {{ typingUsers[1] }} are typing...</span>
+      <span *ngIf="typingUsers.length > 2">{{ typingUsers.length }} people are typing...</span>
+    </div>
+  </div>
+
+  <!-- Mention Dropdown -->
+  <div *ngIf="showMentionDropdown" class="mention-dropdown">
+    <div 
+      *ngFor="let member of filteredMembers" 
+      class="mention-item"
+      (click)="selectMention(member)">
+      <span class="member-name">{{ member.name }}</span>
+      <span class="member-role">{{ member.role }}</span>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input">
+    <div class="input-wrapper">
+      <textarea
+        [(ngModel)]="newMessage"
+        (input)="onMessageInput()"
+        (keydown)="handleKeydown($event)"
+        placeholder="Type a message... (@ to mention)"
+        rows="1"
+        [disabled]="!connected"
+      ></textarea>
+      <button 
+        class="send-btn" 
+        (click)="sendMessage()"
+        [disabled]="!newMessage.trim() || !connected"
+        title="Send message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+    <div *ngIf="!connected" class="offline-warning">
+      ⚠️ Not connected to chat server
+    </div>
+  </div>
+</div>
